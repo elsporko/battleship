@@ -1,0 +1,48 @@
+.grid { margin:1em auto; border-collapse:collapse }
+.grid td {
+    cursor:pointer;
+    width:30px; height:30px;
+    border:1px solid #ccc;
+    text-align:center;
+    font-family:sans-serif;
+    font-size:13px;
+    box-sizing:border-box;
+}
+.grid td.clicked {
+    background-color:yellow;
+    font-weight:bold;
+    color:red;
+}
+.acclicked{
+    color:Crimson;
+}
+td.acclicked{
+    background-color:Crimson;
+}
+.bsclicked{
+    color:DarkGreen;
+}
+td.bsclicked{
+    background-color:DarkGreen;
+}
+.declicked {
+    color:CadetBlue;
+}
+td.declicked {
+    background-color:CadetBlue;
+}
+.suclicked {
+    color:DarkRed;
+}
+td.suclicked {
+    background-color:DarkRed;
+}
+.pbclicked {
+    color:Gold;
+}
+td.pbclicked {
+    background-color:Gold;
+}
+.pickFleet {
+    text-align:center;
+}
