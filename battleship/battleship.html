@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<title>Battleship elsporko style</title>
+
+<link href="grid.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="ships.js"></script>
+<script type="text/javascript" src="config.js"></script>
+<script type="text/javascript" src="board.js"></script>
+<script type="text/javascript" src="grid.js"></script>
+
+</head>
+
+<body>
+    <div id="grid">
+        <script>
+            //dispatchPages['board']()
+            var grid = clickableGrid(10,10,function(el,row,col,i){
+                if (el.className) {
+                    el.className='';
+                } else {
+                }
+            });
+            document.body.appendChild(grid);
+            /*
+            for (var item in page){
+                document.body.appendChild(page[item]);
+            }
+            */
+            ships.place_ships();
+        </script>
+    </div>
+    <!--<div class="">-->
+    <!--
+            var label = document.createElement('div');
+            label.innerHTML=ships[ship].label;
+            label.className=ships[ship].clickClass + 'lbl';
+            rgrp.appendChild(label);
+            -->
+            <!--
+    ships = {
+        aircraftCarrier : {
+            size : 5,
+            id : 'aircraftCarrier',
+            color : 'Crimson',
+            clickClass : 'acclicked',
+            label : 'Aircraft Carrier'
+        },
+        battleship : {
+            size : 4,
+            id : 'battleship',
+            color:'DarkGreen',
+            clickClass : 'bsclicked',
+            label : 'Battleship'
+        },
+        destroyer : {
+            size : 3,
+            id : 'destroyer',
+            color:'CadetBlue',
+            clickClass : 'declicked',
+            label : 'Destroyer'
+        },
+        submarine  : {
+            size : 3,
+            id : 'submarine',
+            color:'DarkRed',
+            clickClass : 'suclicked',
+            label : 'Submarine'
+        },
+        patrolBoat : {
+            size : 2,
+            id : 'patrolBoat',
+            color:'Gold',
+            clickClass : 'pbclicked',
+            label : 'Patrol Boat'
+        },
+
+    };
+    -->
+
+</body>
+</html>

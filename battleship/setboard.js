@@ -1,4 +1,5 @@
 (function (setBoard){
+    /*
     ships = {
         aircraftCarrier : {
             size : 5,
@@ -38,67 +39,78 @@
 
     };
 
+    board={
+        spaces:[],
+        };
+
+*/
     var localClass;
     setBoard.setClass = function(lclass){localClass=ships[lclass].clickClass};
 
     setBoard.setPage = function () {
-
         //TODO - Allow grid size to be entered on setup page
+        //var page=document.createElement('div');
         var grid=clickableGrid(10,10,function(el,row,col,i){
             if (el.className) {
                 el.className='';
             } else {
-                var move = validate_move(localClass);
-                //console.log('move = ' + JSON.stringify(move);
-                console.log('localClass = ' + localClass);
-                console.log('ships[' + localClass + '] = ' + ships[localClass]);
-                if (move.isvalid && move.numPieces < ships[localClass].size) {
-                    el.className=localClass;
-                }
             }
         });
 
-        var rgrp=document.createElement('form');
-        rgrp.setAttribute('name', 'pickFleet');
-        rgrp.className='pickFleet';
+        var rgrp=document.createElement('div');
 
         for (var ship in ships) {
-           var button = document.createElement('input');
-           button.setAttribute('name', 'shipType');
-           button.setAttribute('type', 'radio');
-           button.setAttribute('id', ships[ship].id);
-           button.setAttribute('value', ship);
-           button.addEventListener('click', (function(){
-               // Validate legitimate move (ship goes in a straight line)
-               // Remove selection if max ship spaces have been reached
-               // Set selection class
-           //    var move = validate_move(this.class);
-               /*
-               if (move.error()) {
-                   //TODO set error message and skip the rest
-               }
-               */
-           //    if (move.isvalid && move.numPieces < ships[this.id].size) {
-                   setBoard.setClass(this.id)
-             //      }
-               }), false);
+            var label = document.createElement('div');
+            label.innerHTML=ships[ship].label;
+            label.className=ships[ship].clickClass + 'lbl';
+            rgrp.appendChild(label);
 
-           var label = document.createElement('label');
-           label.className=ships[ship].clickClass;
-           label.innerHTML=ships[ship].label + ' - ' + ships[ship].size;
-           label.setAttribute('for', ships[ship].id);
+/*
+            var boat = document.createElement('div');
+            boat.className='shipblock';
+            boat.setAttribute('draggable','true');
+            boat.setAttribute('id',ships[ship].id);
+            boat.addEventListener('dragstart',(
+                function(ev){
+                    ev.dataTransfer.effectAllowed='move';
+                    //var style = window.getComputedStyle(ev.target, null);
 
-           var lf = document.createElement('br');
+                    // Calculate which square was clicked to guide placement
+                    var square = parseInt(parseInt(ev.clientX, 10) / 30, 10);
+                    **
+                    console.log('square = ' + square);
+                    console.log('clientX ' + ev.clientX);
+                    console.log('clientY ' + ev.clientY);
+                    **
+                    //console.log('target ' + ev.target.id);
+                    console.log( "square:" + square);
+                    console.log( "index:"  + this.id);
 
-           rgrp.appendChild(button);
-           rgrp.appendChild(label);
-           rgrp.appendChild(lf);
+                    ev.dataTransfer.setData("text/plain", 
+                        JSON.stringify({
+                                        "square":square,
+                                        "index" :this.id,
+                                        "orientation": 'x'
+                                       })
+                        );
+                })
+            );
+            */
+            /*
+            for (var r=0; r<ships[ship].size; ++r){
+                var thisboat = document.createElement('div');
+                thisboat.className='grid ' + ships[ship].clickClass;
+                boat.appendChild(thisboat);
+            }
+
+            rgrp.appendChild(boat);
+            */
+            //var lf = document.createElement('br');
+            //rgrp.appendChild(lf);
         }
 
-        //FIXME - Add a button to submit fleet
-        //rgrp.appendChile(lf);
-        
         return { grid : grid, rgrp : rgrp };
+        //return { page : page};
     // Private function
                // Validate legitimate move (ship goes in a straight line)
                // Remove selection if max ship spaces have been reached
@@ -108,12 +120,35 @@
 
             var pieces = document.getElementsByClassName(className);
             var numPieces = pieces.length;
-            console.log ('className = ' + className);
-            console.log ('pieces = ' + JSON.stringify(pieces));
-            console.log ('numPieces = ' + numPieces);
+            //console.log ('className = ' + className);
+            //console.log ('pieces = ' + JSON.stringify(pieces));
+            //console.log ('numPieces = ' + numPieces);
 
             return {isvalid : isvalid, numPieces : numPieces, error : error}
         }
     }
+
+setBoard.place_ships = function(){
+        /* Randomly place ships on the grid */
+        for (var ship in ships) {
+
+            var start_orientation=Math.floor(Math.random()*2);
+            var orientation=['x','y'];
+            
+            while (true) {
+                var start_x=Math.floor(Math.random()*11);
+                var start_y=Math.floor(Math.random()*11);
+                var target=start_x + '_' + start_y;
+                var boat = plot_ship(orientation[start_orientation],{square: 0, index: ships[ship].id}, target);
+
+                if (validate_ship(boat)) break;
+            }
+
+            //console.log('ship: ' + JSON.stringify(ship));
+            adjust_board(boat, ships[ship]);
+            //console.log('boat (' + ships[ship].id + '):' + JSON.stringify(boat));
+
+        }
+}
 
 }(window.setBoard = window.setBoard || {}));
