@@ -2,11 +2,13 @@ function clickableGrid( rows, cols, callback ){
     var i=0;
     var grid = document.createElement('table');
     //console.log('ships: ' + JSON.stringify(ships));
-    grid.className = 'grid';
+    grid.className = 'grid setboard';
+    //grid.className = 'setboard';
     for (var r=0;r<rows;++r){
         var tr = grid.appendChild(document.createElement('tr'));
         for (var c=0;c<cols;++c){
             var cell = tr.appendChild(document.createElement('td'));
+            cell.className='cell';
 
             // Identify matrix coordinates to better track selections
             cell.id = r + '_' + c;
@@ -21,27 +23,20 @@ function clickableGrid( rows, cols, callback ){
             cell.addEventListener('dragstart',(
                 function(ev){
                     ev.dataTransfer.effectAllowed='move';
-                    //var style = window.getComputedStyle(ev.target, null);
+                    var shipCfg = config.ships;
+                    var pieces=this.id.split('_');
+                    var type = board.spaces[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)].type;
 
                     // Calculate which square was clicked to guide placement
-                    var square = parseInt(parseInt(ev.clientX, 10) / 30, 10);
-                    /*
-                    console.log('square = ' + square);
-                    console.log('clientX ' + ev.clientX);
-                    console.log('clientY ' + ev.clientY);
-                    */
-                    //console.log('target ' + ev.target.id);
-                    console.log( "square:" + square);
-                    console.log( "index:"  + this.id);
-                    var pieces=this.id.split('_');
-//board.spaces[parseInt(t_pieces[0], 10)][t_pieces[1]].push({type:ship.id})
-                    console.log( "board:"  + JSON.stringify(board.spaces[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)]));
+                    var square = _find_square(this.id, shipCfg[type].orientation, shipCfg[type].size);
                     ev.dataTransfer.setData("text/plain", 
-//board.spaces[parseInt(pieces[0], 10)][pieces[1]].push({type:ship.id})
                         JSON.stringify({
-                                        "square":square,
-                                        "index" :board.spaces[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)].type,
-                                        "orientation": this.orientation
+                                        square :square,
+                                        index  :shipCfg[type].size,
+                                        type   :type,
+                                        current_coord:shipCfg[type].coordinates
+                                        //type   :board.spaces[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)].type,
+                                        //"orientation": this.orientation
                                        })
                         );
                 })
@@ -53,67 +48,20 @@ function clickableGrid( rows, cols, callback ){
                     var shipCfg = config.ships;
                     console.log('dropping');
                     var dropObj = JSON.parse(ev.dataTransfer.getData("text/plain"));
-                    var ship=shipCfg[dropObj.index];
-                    console.log('dropObj = ' + JSON.stringify(dropObj));
-                    console.log('ship = ' + JSON.stringify(ship));
+                    //console.log('dropObj: ' + JSON.stringify(dropObj));
+                    var ship=shipCfg[dropObj.type];
+                    console.log('ship: '  + JSON.stringify(ship));
+                    console.log('drop target: ' + JSON.stringify(ev.target.id));
 
-                    //console.log('target = ' + ev.target.id);
-
-/*
- * 3 steps:
- *  * Define ship
- *  * Validate all positions
- *  * Turn on class
- */
-// var boat = ships.plot_ship(ship.orientation, dropObj, ev.target.id,
-//                              ships.validate_ship(boat, 
-//                                  board.adjust_board(boat, ship,
-//                                      grid.display_grid()
-//                                  )
-//                              )
-//                           );
-                    var boat = ships.plot_ship(ship.orientation, dropObj, ev.target.id);
-                    if (ships.validate_ship(boat)) {
-                        console.log('Yay validation');
-                        board.adjust_board(boat, ship);
-                        console.log('after board: ' + JSON.stringify(board));
-                        //activate_ship(boat);
-                    } else {
-                        //console.log('Nelson says hah-hah');
+                    //var current_coord=shipCfg[dropObj.type].coordinates;
+                    console.log('current coord: ' + JSON.stringify(dropObj.current_coord));
+                    ships.plotShip(ship.orientation, dropObj, ev.target.id);
+                    if(ships.validateShip(dropObj.type)) {
+                        board.adjustBoard(dropObj.type);
+                        ships.adjustShip(dropObj.type);
+                        ships.displayShip(dropObj.type, dropObj.current_coord);
                     }
 
-                    //console.log('boat: ' + JSON.stringify(boat));
-                    //var orientation = dropObj.orientation;
-
-                    // This is how we doooo it
-                    //b = document.getElementById(ev.target.id); 
-                    //b.className=ship.clickClass;
-
-                    //var chunk = string.split(ev.target.id);
-/*
-
-                    for(var i=0; i++; i < ship.size){
-                        ev.target.class = ship.clickClass;
-                    }
-                    */
-
-                    //console.log('offset = ' + JSON.stringify(ev.dataTransfer.getData("text/plain")));
-                    /*
-                    var src = ev.dataTransfer.getData("Text");
-                    ev.target.appendChild(document.getElementById(src));
-                    //ev.stopPropagation();
-                    return false;
-                    */
-                    /*
-                    var offset = ev.dataTransfer.getData("text/plain").split(',');
-                    //var dm = document.getElementById('dragme');
-                    var dm = document.getElementsByClassName('grid');
-                    console.log('dm => ' + JSON.stringify(dm));
-                    var style = window.getComputedStyle(ev.target, null);
-                    //console.log('style => ' + JSON.stringify(style));
-                    //dm.style.left = (ev.clientX + parseInt(offset[0],10)) + 'px';
-                    //dm.style.top = (ev.clientY + parseInt(offset[1],10)) + 'px';
-                    */
                     ev.stopPropagation();
                     ev.preventDefault();
                     return false;
@@ -121,50 +69,77 @@ function clickableGrid( rows, cols, callback ){
                 )
             );
 
-            cell.addEventListener('dragend',(
-                function(ev){
-                    console.log('dragend');
-                    //ev.preventDefault();
-                    //return false;
-                    return true;
-                }
-            ));
-
             cell.addEventListener('dragover',(
                 function(ev){
                     console.log('dragover');
-                    //ev.stopPropagation();
                     ev.preventDefault();
-                    //console.log('default prevented');
                     ev.dataTransfer.dropEffect='move';
                     return false;
                     }
                 ));
+
+            cell.addEventListener('click', (function(e){
+                var shipCfg = config.ships;
+                var pieces=this.id.split('_');
+                var type = board.spaces[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)].type;
+                //console.log('1--ship' + JSON.stringify(shipCfg[type]));
+                //var current_coord=shipCfg[type].coordinates;
+
+                // Calculate which square was clicked to guide placement
+                var square = _find_square(this.id, shipCfg[type].orientation, shipCfg[type].size);
+                var oMap = {x: 'y', y: 'x'};
+                shipCfg[type].orientation = oMap[shipCfg[type].orientation];
+                //console.log('click current_coord' + JSON.stringify(current_coord));
+                console.log('ship' + JSON.stringify(shipCfg[type]));
+
+                var current_coord=shipCfg[type].coordinates;
+
+                ships.plotShip(shipCfg[type].orientation,
+                                           {type: shipCfg[type].id, 
+                                            square: square,
+                                            index: shipCfg[type].size},
+                               this.id);
+                //console.log('2--ship' + JSON.stringify(shipCfg[type]));
+                //console.log('current_coord: ' + JSON.stringify(current_coord));
+
+                if (ships.validateShip(shipCfg[type].id)) {
+                    board.adjustBoard(shipCfg[type].id);
+                    ships.adjustShip(shipCfg[type].id);
+                    ships.displayShip(shipCfg[type].id, current_coord, 1);
+                } else {
+                    // Reset change to orientation
+                    shipCfg[type].orientation = oMap[shipCfg[type].orientation]
+                }
+
+                }));
         }
     }
 
     return grid;
 }
 
-/*
-function adjust_board(boat, ship){
-    for (var p=0; p < boat.length; p++) {
-        var t_pieces = boat[p].split('_');
-        //console.log('t_pieces: ' + JSON.stringify(t_pieces));
+function _find_square(start_pos, orientation, size){
+    // beginning at start_pos traverse the ship according to the board struct
+    // until the endpoint is hit. The value of square=size of ship - number of squares
+    // to the end point.
+    var t_pieces=start_pos.split('_');
+    var pieces={
+        "x":t_pieces[0],
+        "y":t_pieces[1],
+    };
+    var type = board.spaces[pieces.x][pieces.y].type;
+    var i;
 
-        //board.spaces[parseInt(t_pieces[0], 10)][t_pieces[1]].push({type:ship.id});
-        var x=parseInt(t_pieces[0], 10);
-        var y=parseInt(t_pieces[1], 10);
-        if (typeof board.spaces[x] === 'undefined') {
-            board.spaces[x] = new Array();
+    for (i=0; i < size; i++) {
+        if (board.spaces[pieces.x] &&
+            board.spaces[pieces.x][pieces.y] &&
+            type == board.spaces[pieces.x][pieces.y].type){
+            pieces[orientation]++;
+        } else {
+            break;
         }
-        board.spaces[x][y] = {type:ship.id};
-        //console.log('ab board: ' + JSON.stringify(board));
-        //board.spaces.t_pieces[0].push(t_pieces[1]);
-        //console.log('Setting class ' + ship.clickClass + ' for id ' + boat[p]);
-        var b = document.getElementById(boat[p]); 
-        b.className=ship.clickClass;
     }
-}
-*/
 
+//    return size - i + 1;
+    return size - i;
+}

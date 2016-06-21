@@ -1,42 +1,25 @@
-table.grid { margin:1em auto; border-collapse:collapse;
-        border-collapse:collapse;
-        border:1px solid #ccc;
-        box-sizing:border-box;
-        cursor:pointer;
-        float: left;
-        font-family:sans-serif;
-        font-size:13px;
-        text-align:center;
-        height:300px;
-        width:300px; 
-}
-.grid td.grid {
-        border-collapse:collapse;
-        border:1px solid #ccc;
-        box-sizing:border-box;
-        cursor:pointer;
-        float: left;
-        font-family:sans-serif;
-        font-size:13px;
-        text-align:center;
-        height:30px;
-        width:30px; 
-}
-
-.shiplist{
-    float: left;
-}
-.cell{
+.grid { margin:1em auto; border-collapse:collapse }
+.grid td, div {
+    cursor:pointer;
+    width:30px; height:30px;
     border:1px solid #ccc;
-    border-collapse:collapse;
+    text-align:center;
+    font-family:sans-serif;
+    font-size:13px;
+    box-sizing:border-box;
+}
+.grid td.clicked {
+    background-color:yellow;
+    font-weight:bold;
+    color:red;
 }
 
-.binit{
-    display:none;
+div.grid{
+    float:left;
 }
 
-.setboard{
-    /*display:none;*/
+#grid{
+    top: 150 px;
 }
 
 .acclickedlbl{
@@ -85,25 +68,29 @@ div.pbclicked, td.pbclicked {
     color:Gold;
     border:none;
 }
+.pickFleet {
+    text-align:center;
+}
+.shipblock {
+    display: table-row;
+}
+
 div.instructions{
-    width:100%;
     border: none;
-    padding: 100px;
 }
 #instructions {
     padding:10px;
     float:left;
-    width:100%;
+    width:450px;
     border:none;
-    text-align:center;
-    font-family:sans-serif;
 }
-
+#setBoard {
+    border:none;
+}
 .shiplabel {
     padding:10px;
     float:left;
-    width:120px;
+    width:45px;
     border:none;
-    text-align:left;
 }
 
