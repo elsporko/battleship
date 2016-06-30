@@ -1,17 +1,7 @@
 var http = require('http');
 var express = require('express');
-var sockjs = require('sockjs');
-
-var echo = sockjs.createServer({});
-echo.on('connection', function(conn) {
-        conn.on('data', function(message) {
-                    conn.write(message);
-                        });
-            conn.on('close', function() {});
-});
 
 var server = http.createServer();
-echo.installHandlers(server, {prefix:'/echo'});
 /*
  * var ip=getIP();
  * console.log("IP: " + ip);

@@ -1,0 +1,22 @@
+{
+  "name": "battleship",
+  "version": "0.0.0",
+  "description": "Battleship ala elsporko",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.14.0",
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "John Spooner",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/elsporko/battleship"
+  },
+  "bugs": {
+    "url": "https://github.com/elsporko/battleship/issues"
+  }
+}
