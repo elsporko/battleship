@@ -1,13 +1,21 @@
-var http = require('http');
-var express = require('express');
+var express    = require('express')
+//  , jsonfile   = require('jsonfile')
+  , fs         = require('fs')
+  , http      = require('http')
+  , bodyParser = require('body-parser');
 
-var server = http.createServer();
-/*
- * var ip=getIP();
- * console.log("IP: " + ip);
- * server.listen(9999, getIP());
- * */
-var ip='192.168.1.150';
-console.log("IP: " + ip);
-server.listen(9999, ip);
+var app = express();
+app.use(express.static('static'));
 
+var routes = require ('./routes/routes.js')(app);
+
+//const PORT = 3000;
+
+// all environments
+app.set('view engine', 'pug');
+//app.set('port', PORT);
+//app.set('port', process.env.PORT || PORT);
+//app.use(bodyParser.json());
+
+//http.createServer(app).listen(3000, '192.168.1.150');
+app.listen(9999, '192.168.1.150');

@@ -1,0 +1,36 @@
+html
+  head
+    title="Battleship elsporko style"
+    link(href='css/grid.css' rel='stylesheet' type='text/css')
+    script(src='javascript/ships.js')
+    script(src='javascript/config.js')
+    script(src='javascript/board.js')
+    script(src='javascript/grid.js')
+  body
+    #binit
+      form
+        p Handle:
+        input(placeholder="Who are you")
+
+    #setbord
+      section#instructions
+      p <strong>Set initial fleet</strong>
+-       list = ["Drag boat to reposition", "Click boat to change course heading (East/West <-> North/South)"]
+      ul
+      each item in list
+          li= item          
+      section#grid
+        aside#shiplist
+          p.shiplabel.acclickedlbl Aircraft Carrier
+          p.shiplabel.bsclickedlbl Battleship
+          p.shiplabel.declickedlbl Destroyer
+          p.shiplabel.suclickedlbl Submarine
+          p.shiplabel.pbclickedlbl Patrol Boat
+
+      script(type=javascript).
+        var grid = clickableGrid(10,10,function(el,row,col,i){});
+        document.body.appendChild(grid);
+        ships.placeShips();
+
+      form
+        button(value="Play Game" name=playGame)

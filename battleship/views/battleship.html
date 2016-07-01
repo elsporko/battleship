@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<title>Battleship elsporko style</title>
+
+<link href="grid.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="ships.js"></script>
+<script type="text/javascript" src="config.js"></script>
+<script type="text/javascript" src="board.js"></script>
+<script type="text/javascript" src="grid.js"></script>
+
+</head>
+
+<body>
+    <!-- Initialize or join a game -->
+    <div class="binit">
+        <form>
+            Handle:
+            <input type="text" name="handle" size="25" maxlength="25"
+             placeholder="Who are you">
+        </form>
+    </div>
+
+    <!-- Set own board -->
+    <div class="setboard">
+        <section id="instructions">
+                <strong>Set initial fleet</strong>
+                <ul>
+                    <li>Drag boat to reposition</li>
+                    <li>Click boat to change course heading (East/West <-> North/South)</li>
+                </ul>
+        </section>
+
+        <section id="grid">
+            <aside id="shiplist">
+                <div class="shiplabel acclickedlbl">Aircraft Carrier<br/></div>
+                <div class="shiplabel bsclickedlbl">Battleship</div><br/>
+                <div class="shiplabel declickedlbl">Destroyer</div><br/>
+                <div class="shiplabel suclickedlbl">Submarine</div><br/>
+                <div class="shiplabel pbclickedlbl">Patrol Boat</div>
+            </aside>
+
+            <script>
+                var grid = clickableGrid(10,10,function(el,row,col,i){
+                    /*
+                    if (el.className) {
+                        el.className='';
+                    } else {
+                    }
+                    */
+                });
+                document.body.appendChild(grid);
+                ships.placeShips();
+            </script>
+            <form>
+                <input type="button" value="Play Game" name="playGame"/>
+            </form>
+        </section>
+    </div>
+
+    <!-- Let the game begin -->
+    <div id="playGame">
+    </div>
+
+</body>
+</html>
