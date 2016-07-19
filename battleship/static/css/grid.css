@@ -23,6 +23,11 @@ table.grid { margin:1em auto; border-collapse:collapse;
         width:30px; 
 }
 
+#playGame{
+    height: 25px;
+    width: 125px;
+}
+
 .shiplist{
     float: left;
 }

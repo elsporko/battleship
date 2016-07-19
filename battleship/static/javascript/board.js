@@ -1,7 +1,7 @@
 (function (board, callback){
     board.adjustBoard = function (type, callback){
         var shipsCfg=config.ships;
-        console.log('adjustBoard');
+        //console.log('adjustBoard');
         //console.log('type: ' + type);
         //console.log('cfg type: ' + JSON.stringify(shipsCfg[type].plotted));
         //var plotted=shipsCfg[type].plotted;

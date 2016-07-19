@@ -46,15 +46,15 @@ function clickableGrid( rows, cols, callback ){
             cell.addEventListener('drop',(
                 function(ev){
                     var shipCfg = config.ships;
-                    console.log('dropping');
+                    //console.log('dropping');
                     var dropObj = JSON.parse(ev.dataTransfer.getData("text/plain"));
                     //console.log('dropObj: ' + JSON.stringify(dropObj));
                     var ship=shipCfg[dropObj.type];
-                    console.log('ship: '  + JSON.stringify(ship));
-                    console.log('drop target: ' + JSON.stringify(ev.target.id));
+                    //console.log('ship: '  + JSON.stringify(ship));
+                    //console.log('drop target: ' + JSON.stringify(ev.target.id));
 
                     //var current_coord=shipCfg[dropObj.type].coordinates;
-                    console.log('current coord: ' + JSON.stringify(dropObj.current_coord));
+                    //console.log('current coord: ' + JSON.stringify(dropObj.current_coord));
                     ships.plotShip(ship.orientation, dropObj, ev.target.id);
                     if(ships.validateShip(dropObj.type)) {
                         board.adjustBoard(dropObj.type);
@@ -71,7 +71,7 @@ function clickableGrid( rows, cols, callback ){
 
             cell.addEventListener('dragover',(
                 function(ev){
-                    console.log('dragover');
+                    //console.log('dragover');
                     ev.preventDefault();
                     ev.dataTransfer.dropEffect='move';
                     return false;
@@ -90,7 +90,7 @@ function clickableGrid( rows, cols, callback ){
                 var oMap = {x: 'y', y: 'x'};
                 shipCfg[type].orientation = oMap[shipCfg[type].orientation];
                 //console.log('click current_coord' + JSON.stringify(current_coord));
-                console.log('ship' + JSON.stringify(shipCfg[type]));
+                //console.log('ship' + JSON.stringify(shipCfg[type]));
 
                 var current_coord=shipCfg[type].coordinates;
 

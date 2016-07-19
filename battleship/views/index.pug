@@ -3,9 +3,12 @@ html
     title="Battleship elsporko style"
     link(href='css/grid.css' rel='stylesheet' type='text/css')
     script(src='javascript/ships.js')
+    //script(href='https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.1/sockjs.js')
+    script(src='javascript/sockjs.js')
     script(src='javascript/config.js')
     script(src='javascript/board.js')
     script(src='javascript/grid.js')
+    script(src='javascript/stomp.js')
   body
     #binit
       form
@@ -15,10 +18,10 @@ html
     #setbord
       section#instructions
       p <strong>Set initial fleet</strong>
--       list = ["Drag boat to reposition", "Click boat to change course heading (East/West <-> North/South)"]
+-       list=["Drag boat to reposition", "Click boat to change course heading (East/West <-> North/South)"]
       ul
       each item in list
-          li= item          
+          li=item          
       section#grid
         aside#shiplist
           p.shiplabel.acclickedlbl Aircraft Carrier
@@ -28,9 +31,51 @@ html
           p.shiplabel.pbclickedlbl Patrol Boat
 
       script(type=javascript).
-        var grid = clickableGrid(10,10,function(el,row,col,i){});
+        //var ws=new WebSocket('ws://192.168.1.100:61613');
+        //console.log('ws: ' + JSON.stringify(ws));
+        //ws.send('This is a test');
+        //var url = "http://192.168.1.100:61613";
+        var url = "http://192.168.1.100:15674/stomp";
+        //var client = Stomp.client(url);
+        var ws = new SockJS(url);
+        var client = Stomp.over(ws);
+        var header = {
+            login: 'test',
+            passcode: 'test'
+        };
+
+        client.heartbeat.outgoing=0;
+        client.heartbeat.incoming=0;
+
+        client.connect('test', 'test',
+            function(){
+                //console.log('Hooray! Connected');
+                client.subscribe("CommandCentral",
+                    function(message){
+                        console.log('subscribed: ' + JSON.stringify(message))
+                    });
+                //client.publish("CommandCentral", {priority: 9}, {'action':'register', 'userHandle':'elsporko'});
+                client.send("/queue/CommandCentral", {priority: 9}, {'action':'register', 'userHandle':'elsporko'});
+            },
+            function(error){
+                console.log('Error connecting to WS via stomp:' + JSON.stringify(error));
+            }
+            );
+        /*
+        client.heartbeat.outgoing=1000;
+        client.send("/queue/test", {priority: 9}, "Hello, STOMP");
+        */
+        //client.send("/queue/CommandCentral", {priority: 9}, {'action':'register', 'userHandle':'elsporko'});
+
+        console.log('client: ' + JSON.stringify(client));
+
+
+
+        var grid=clickableGrid(10,10,function(el,row,col,i){});
         document.body.appendChild(grid);
         ships.placeShips();
 
       form
-        button(value="Play Game" name=playGame)
+        p
+        button(value="Play Game" name="playGame" id="playGame") Play Game
+
