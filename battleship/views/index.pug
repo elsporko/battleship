@@ -3,12 +3,12 @@ html
     title="Battleship elsporko style"
     link(href='css/grid.css' rel='stylesheet' type='text/css')
     script(src='javascript/ships.js')
-    //script(href='https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.1/sockjs.js')
-    script(src='javascript/sockjs.js')
+    script(src='javascript/sockjs.js') //v 1.0.3
     script(src='javascript/config.js')
     script(src='javascript/board.js')
     script(src='javascript/grid.js')
     script(src='javascript/stomp.js')
+    script(src='javascript/register.js')
   body
     #binit
       form
@@ -47,28 +47,34 @@ html
         client.heartbeat.outgoing=0;
         client.heartbeat.incoming=0;
 
-        client.connect('test', 'test',
+        client.connect(header,
             function(){
                 //console.log('Hooray! Connected');
-                client.subscribe("CommandCentral",
+                /*
+                client.subscribe("/exchange/CommandCentral",
                     function(message){
                         console.log('subscribed: ' + JSON.stringify(message))
                     });
-                //client.publish("CommandCentral", {priority: 9}, {'action':'register', 'userHandle':'elsporko'});
-                client.send("/queue/CommandCentral", {priority: 9}, {'action':'register', 'userHandle':'elsporko'});
+                */
+                var corr = generateUuid();
+
+                client.subscribe('/queue/CommandCentral', function(msg){
+                    if(msg.properties.correlationId == corr) {
+                        console.log(' [.] Got %s', JSON.stringify(msg));
+                        //setTimeout(function() {conn.close(); //process.exit(0); }, 500);
+                    }
+                    }, {noAck: true});
+
+                client.send('/queue/CommandCentral',
+                    {}, //new Buffer('elsporko'),
+                    {correlationId: corr, replyTo: '/queue/CommandCentral', handle: 'elsporko'});
             },
             function(error){
                 console.log('Error connecting to WS via stomp:' + JSON.stringify(error));
             }
             );
-        /*
-        client.heartbeat.outgoing=1000;
-        client.send("/queue/test", {priority: 9}, "Hello, STOMP");
-        */
-        //client.send("/queue/CommandCentral", {priority: 9}, {'action':'register', 'userHandle':'elsporko'});
 
         console.log('client: ' + JSON.stringify(client));
-
 
 
         var grid=clickableGrid(10,10,function(el,row,col,i){});
