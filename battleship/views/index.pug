@@ -3,11 +3,13 @@ html
     title="Battleship elsporko style"
     link(href='css/grid.css' rel='stylesheet' type='text/css')
     script(src='javascript/ships.js')
-    script(src='javascript/sockjs.js') //v 1.0.3
+    //script(src='javascript/sockjs.js') //v 1.0.3
+    script(src='//cdn.jsdelivr.net/sockjs/1/sockjs.min.js')
     script(src='javascript/config.js')
     script(src='javascript/board.js')
     script(src='javascript/grid.js')
-    script(src='javascript/stomp.js')
+    //script(src='javascript/stomp.js')
+    script(src='javascript/webstomp.js')
     script(src='javascript/register.js')
   body
     #binit
@@ -31,52 +33,62 @@ html
           p.shiplabel.pbclickedlbl Patrol Boat
 
       script(type=javascript).
-        //var ws=new WebSocket('ws://192.168.1.100:61613');
-        //console.log('ws: ' + JSON.stringify(ws));
-        //ws.send('This is a test');
-        //var url = "http://192.168.1.100:61613";
         var url = "http://192.168.1.100:15674/stomp";
-        //var client = Stomp.client(url);
-        var ws = new SockJS(url);
-        var client = Stomp.over(ws);
+        var sockjs = new SockJS(url);
+        var corr = generateUuid();
         var header = {
             login: 'test',
             passcode: 'test'
         };
+        var client = webstomp.over(sockjs, {heartbeat: false, debug: true});
 
-        client.heartbeat.outgoing=0;
-        client.heartbeat.incoming=0;
+        sockjs.addEventListener('message', function(e){
+
+                for (var key in e) {
+                      if (e.hasOwnProperty(key)) {
+                        var val = e[key];
+                        //console.log(key + ': ' + val);
+                        console.log('typeof %s: %s', val, typeof val);
+
+                        if(typeof e[key] == "object"){
+                              console.log('thing: %s', JSON.stringify(e[key]));
+                        }
+                      }
+                }
+
+            console.log('e: %s', JSON.stringify(e.data));
+            console.log('\te_data_corr: %s\n\tcorr: %s', e.data.correlationId, corr);
+
+            if(e.data.correlationId == corr) {
+                console.log(' [.] Got %s', JSON.stringify(e));
+                //setTimeout(function() {conn.close()}, 500);
+            }
+        });
 
         client.connect(header,
-            function(){
-                //console.log('Hooray! Connected');
-                /*
-                client.subscribe("/exchange/CommandCentral",
-                    function(message){
-                        console.log('subscribed: ' + JSON.stringify(message))
-                    });
-                */
-                var corr = generateUuid();
-
-                client.subscribe('/queue/CommandCentral', function(msg){
-                    if(msg.properties.correlationId == corr) {
-                        console.log(' [.] Got %s', JSON.stringify(msg));
-                        setTimeout(function() {conn.close()}, 500);
-                    }
+            function(msg){
+                client.subscribe('/queue/register.elsporko', function(msg){
                     }, {noAck: true});
 
-                var enc = new TextEncoder("utf-8");
-                client.send('/queue/CommandCentral',
-                    enc.encode("elsporko"),
-                    {correlationId: corr, replyTo: '/queue/CommandCentral'});
-            },
-            function(error){
-                console.log('Error connecting to WS via stomp:' + JSON.stringify(error));
-            }
+            var enc = new TextEncoder('utf8');
+            var param = enc.encode('elsporko');
+            console.log('passing %s', param);
+
+            client.send('/queue/register',
+                enc.encode("elsporko"),
+                {'correlationId': corr,
+                 'reply-to': '/temp-queue/register.elsporko'
+                }
             );
 
-        console.log('client: ' + JSON.stringify(client));
+            },
 
+            function(error){
+                console.log('Error connecting to WS via stomp:'+JSON.stringify(error));
+            }
+        );
+            
+        //console.log('client: ' + JSON.stringify(client));
 
         var grid=clickableGrid(10,10,function(el,row,col,i){});
         document.body.appendChild(grid);
