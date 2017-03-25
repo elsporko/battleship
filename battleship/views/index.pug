@@ -3,13 +3,13 @@ html
     title="Battleship elsporko style"
     link(href='css/grid.css' rel='stylesheet' type='text/css')
     script(src='javascript/ships.js')
-    //script(src='javascript/sockjs.js') //v 1.0.3
     script(src='//cdn.jsdelivr.net/sockjs/1/sockjs.min.js')
     script(src='javascript/config.js')
     script(src='javascript/board.js')
     script(src='javascript/grid.js')
     //script(src='javascript/stomp.js')
-    script(src='javascript/webstomp.js')
+    //script(src='javascript/webstomp.js')
+    script(src='javascript/webstomp.min.js')
     script(src='javascript/register.js')
   body
     #binit
@@ -33,12 +33,12 @@ html
           p.shiplabel.pbclickedlbl Patrol Boat
 
       script(type=javascript).
-        var url = "http://192.168.1.100:15674/stomp";
+        var url = "http://192.168.1.168:15674/stomp";
         var sockjs = new SockJS(url);
         var corr = generateUuid();
         var header = {
-            login: 'test',
-            passcode: 'test'
+            login: 'guest',
+            passcode: 'guest'
         };
         var client = webstomp.over(sockjs, {heartbeat: false, debug: true});
 
