@@ -1,4 +1,7 @@
 (function (ships){
+    ships.properties={
+    };
+
     ships.placeShips = function(){
             /* Randomly place ships on the grid */
             var shipsCfg = config.ships;
@@ -28,15 +31,9 @@
 
     ships.displayShip = function(type, current_coord, skip) {
         var shipsCfg = config.ships;
-        //console.log('DS-type:' + type);
-        //console.log('displayShip');
 
-        //console.log('ships: ' + JSON.stringify(shipsCfg));
-        //console.log('current_coord: ' + JSON.stringify(current_coord));
         if (typeof current_coord !== undefined){
             for (coord in current_coord) {
-                //console.log('setting: ' + current_coord[coord]);
-                //setSpace(current_coord[coord], '');
                 setSpace(current_coord[coord], shipsCfg[type].clickClass);
             }
         }
@@ -78,10 +75,9 @@
      ships.validateShip = function (type, callback){
         var shipsCfg = config.ships;
         var plotted = shipsCfg[type].plotted;
-        //console.log('validateShip');
+
         // Check first and last positions to see if they are in bounds
         if (!document.getElementById(plotted[0]) ||!document.getElementById(plotted[plotted.length -1])) {
-            //console.log('Out of bounds');
             return 0;
         }
 
@@ -95,7 +91,6 @@
             if (typeof board.spaces[x] !== 'undefined' && 
                 typeof board.spaces[x][y] !== 'undefined' &&
                 board.spaces[x][y].type != type) { 
-                    //console.log('space occupied by ' + board.spaces[x][y]);
                     return 0
             }
         }
@@ -106,7 +101,6 @@
 
     ships.adjustShip = function (type, callback){
         var shipsCfg = config.ships;
-        //console.log('adjustShip');
 
         // Wipe out existing coordinates
         shipsCfg[type].coordinates.length=0;
@@ -116,7 +110,6 @@
             shipsCfg[type].coordinates[p] = shipsCfg[type].plotted[p];
         }
 
-        //console.log('ships: ' + JSON.stringify(shipsCfg));
         if (typeof callback === "function") {return callback();}
         return 1;
     }
