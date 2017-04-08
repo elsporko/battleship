@@ -9,13 +9,13 @@ app.use(express.static('static'));
 
 var routes = require ('./routes/routes.js')(app);
 
-//const PORT = 3000;
+app.set('port', process.env.PORT || 3000);
+app.set('host', process.env.HOST || '0.0.0.0');
 
 // all environments
 app.set('view engine', 'pug');
-//app.set('port', PORT);
-//app.set('port', process.env.PORT || PORT);
 //app.use(bodyParser.json());
 
-//http.createServer(app).listen(3000, '192.168.1.150');
-app.listen(9999, '192.168.1.168');
+http.createServer(app).listen(app.get('port'), app.get('host'), function(){
+      console.log("Express server listening on port " + app.get('port'));
+});

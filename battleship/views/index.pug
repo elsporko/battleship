@@ -34,15 +34,15 @@ html
 
       script(type=javascript).
 
-      //console.log('client: ' + JSON.stringify(client));
+        //console.log('client: ' + JSON.stringify(client));
 
-      // Connect to RabbitMQ
-      //bs_mq.connect();
-      var grid=clickableGrid(10,10,function(el,row,col,i){});
-      document.body.appendChild(grid);
-      ships.placeShips();
+        // Connect to RabbitMQ
+        //bs_mq.connect();
+        var grid=clickableGrid(10,10,function(el,row,col,i){});
+        document.body.appendChild(grid);
+        ships.placeShips();
 
-      form
-        p
-        button(value="Play Game" name="playGame" id="playGame") Play Game
+        form
+          p
+          button(value="Play Game" name="playGame" id="playGame") Play Game
 

@@ -5,6 +5,7 @@ var express    = require('express')
   , bodyParser = require('body-parser');
 
 var app = express();
+app.use(express.static('static'));
 
 var routes = require ('./routes/routes.js')(app);
 
@@ -17,4 +18,4 @@ app.set('view engine', 'pug');
 //app.use(bodyParser.json());
 
 //http.createServer(app).listen(3000, '192.168.1.150');
-app.listen(9999, '192.168.1.150');
+app.listen(9999, '192.168.1.168');
