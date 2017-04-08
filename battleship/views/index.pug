@@ -33,10 +33,10 @@ html
           p.shiplabel.pbclickedlbl Patrol Boat
 
       script(type=javascript).
-        //console.log('client: ' + JSON.stringify(client));
+      //console.log('client: ' + JSON.stringify(client));
 
-	// Connect to RabbitMQ
-	//bs_mq.connect();
+      // Connect to RabbitMQ
+        bs_mq.connect();
         var grid=clickableGrid(10,10,function(el,row,col,i){});
         document.body.appendChild(grid);
         ships.placeShips();
