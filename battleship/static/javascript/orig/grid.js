@@ -1,4 +1,4 @@
-module.exports = function clickableGrid( rows, cols, callback ){
+function clickableGrid( rows, cols, callback ){
     var i=0;
     var grid = document.createElement('table');
     //console.log('ships: ' + JSON.stringify(ships));

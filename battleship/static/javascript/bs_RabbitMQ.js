@@ -1,12 +1,13 @@
 (function (bs_mq) { 
-	const bs_mq.config={
-	    sockjs       : new SockJS('http://192.168.1.100:15674/stomp'),
+	let config = {
+	          sockjs       : new SockJS('http://192.168.1.100:15674/stomp'),
             corr         : generateUuid(),
             hdr_login    : 'test',
             hdr_passcode : 'test'
         };
 
-        const client = webstomp.over(sockjs, {heartbeat: false, debug: true});
+        let sockjs = config.sockjs;
+        let client = webstomp.over(sockjs, {heartbeat: false, debug: true});
 
         sockjs.addEventListener('message', function(e){
 
@@ -31,6 +32,8 @@
             }
         });
 
+        let header={user: config.hdr_login,
+                    pass: config.hdr_passcode};
         client.connect(header,
             function(msg){
                 client.subscribe('/queue/register.elsporko', function(msg){
@@ -42,7 +45,7 @@
 
             client.send('/queue/register',
                 enc.encode("elsporko"),
-                {'correlationId': corr,
+                {'correlationId': config.corr,
                  'reply-to': '/temp-queue/register.elsporko'
                 }
             );

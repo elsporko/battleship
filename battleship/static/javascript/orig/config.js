@@ -1,11 +1,14 @@
-module.exports = function config (config){
-    ships = {
+(function (config){
+    config.ships = {
         aircraftCarrier : {
             size : 5,
             id : 'aircraftCarrier',
             color : 'Crimson',
             clickClass : 'acclicked',
             label : 'Aircraft Carrier',
+            orientation : '',
+            plotted : [],
+            coordinates : []
         },
         battleship : {
             size : 4,
@@ -13,6 +16,9 @@ module.exports = function config (config){
             color:'DarkGreen',
             clickClass : 'bsclicked',
             label : 'Battleship',
+            orientation : '',
+            plotted : [],
+            coordinates : []
         },
         destroyer : {
             size : 3,
@@ -20,6 +26,9 @@ module.exports = function config (config){
             color:'CadetBlue',
             clickClass : 'declicked',
             label : 'Destroyer',
+            orientation : '',
+            plotted : [],
+            coordinates : []
         },
         submarine  : {
             size : 3,
@@ -27,6 +36,9 @@ module.exports = function config (config){
             color:'DarkRed',
             clickClass : 'suclicked',
             label : 'Submarine',
+            orientation : '',
+            plotted : [],
+            coordinates : []
         },
         patrolBoat : {
             size : 2,
@@ -34,6 +46,14 @@ module.exports = function config (config){
             color:'Gold',
             clickClass : 'pbclicked',
             label : 'Patrol Boat',
+            orientation : '',
+            plotted : [],
+            coordinates : []
         },
     };
-}
+
+    board={
+        spaces:[],
+        };
+
+}(window.config = window.config || {}));
