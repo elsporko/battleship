@@ -9,7 +9,9 @@
     "pug": "^2.0.0-beta3",
     "sockjs": "^0.3.17"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jasmine": "^2.5.3"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

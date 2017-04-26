@@ -2,15 +2,17 @@ html
   head
     title="Battleship elsporko style"
     link(href='css/grid.css' rel='stylesheet' type='text/css')
-    script(src='javascript/ships.js')
+    script(src='battleship.js')
+    //script(src='javascript/ships.js')
     script(src='//cdn.jsdelivr.net/sockjs/1/sockjs.min.js')
-    script(src='javascript/config.js')
-    script(src='javascript/board.js')
-    script(src='javascript/grid.js')
+    //script(src='javascript/config.js')
+    //script(src='javascript/board.js')
+    //script(src='javascript/grid.js')
     //script(src='javascript/stomp.js')
     //script(src='javascript/webstomp.js')
     script(src='javascript/webstomp.min.js')
-    script(src='javascript/register.js')
+    //script(src='javascript/register.js')
+    //script(src='javascript/bs_RabbitMQ.js')
   body
     #binit
       form
@@ -33,7 +35,6 @@ html
           p.shiplabel.pbclickedlbl Patrol Boat
 
       script(type=javascript).
-
         //console.log('client: ' + JSON.stringify(client));
 
         // Connect to RabbitMQ
@@ -42,7 +43,7 @@ html
         document.body.appendChild(grid);
         ships.placeShips();
 
-        form
-          p
-          button(value="Play Game" name="playGame" id="playGame") Play Game
+      form
+        p
+        button(value="Play Game" name="playGame" id="playGame") Play Game
 
