@@ -1,16 +1,20 @@
-module.exports = function clickableGrid( rows, cols, callback ){
+/*
+ * Build the grid and attach handlers for drag/drop events
+ */
+let clickableGrid = function ( rows, cols, callback ){
     var i=0;
     var grid = document.createElement('table');
     //console.log('ships: ' + JSON.stringify(ships));
-    grid.className = 'grid setboard';
+    grid.className = 'grid setboard'; // TODO: what is purpose of setboard class? can it be deleted?
     //grid.className = 'setboard';
     for (var r=0;r<rows;++r){
         var tr = grid.appendChild(document.createElement('tr'));
         for (var c=0;c<cols;++c){
             var cell = tr.appendChild(document.createElement('td'));
+            // Each cell on the grid is of class 'cell'
             cell.className='cell';
 
-            // Identify matrix coordinates to better track selections
+            // Set the ID value of each cell to the row/column value formatted as r_c
             cell.id = r + '_' + c;
             /* Save this for the gameplay portion. Act on single cell clicks
             cell.addEventListener('click',(function(el,r,c,i){
@@ -19,6 +23,7 @@ module.exports = function clickableGrid( rows, cols, callback ){
                 }
             })(cell,r,c,i),false);
             */
+            // Set up drag and drop for each cell.
             cell.setAttribute('draggable','true');
             cell.addEventListener('dragstart',(
                 function(ev){
@@ -143,3 +148,8 @@ function _find_square(start_pos, orientation, size){
 //    return size - i + 1;
     return size - i;
 }
+
+module.s=exports={
+    clickableGrid: clickableGrid,
+}
+
