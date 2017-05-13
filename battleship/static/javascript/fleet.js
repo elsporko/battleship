@@ -1,6 +1,6 @@
 let nauticalMap = {}; // Hash lookup that tracks each ship's starting point and current orientation
 
-let _buildNauticalChart = function(){
+let buildNauticalChart = function(){
 	let chart = new Array;
 	for(let i=0; i < 10; i++) {
 		chart[i] = new Array;
@@ -11,7 +11,7 @@ let _buildNauticalChart = function(){
 	return chart;
 }
 
-let nauticalChart = _buildNauticalChart(); // Detailed matrix of every ship in the fleet
+let nauticalChart = buildNauticalChart(); // Detailed matrix of every ship in the fleet
 
 let getFleet = function(type){
 	let orientation = nauticalMap.type.orientation == 'x' ? 0 : 1;
@@ -48,6 +48,10 @@ function setSpace(space, className) {
     b.classList.toggle(className);
 }
 
+// TODO - setFleet: Remove previous ship from chart
+/*
+ * setFleet - place ship on nautical chart
+ */
 let setFleet = function (orientation, square, type, size, target){
     // Square represents the square on the ship that is the focus of the action
     var t_pieces = target.split('_');
@@ -144,5 +148,6 @@ module.exports = {
     setFleet: setFleet,
     validateShip: validateShip,
     adjustShip: adjustShip,
-    checkGrid: checkGrid
+    checkGrid: checkGrid,
+    buildNauticalChart: buildNauticalChart
 }

@@ -1,13 +1,17 @@
-(function (bs_mq) { 
+let amqp = require('amqplib');
+
+let sockjs = new SockJS('http://192.168.1.100:15674/stomp'),
+let client = webstomp.over(sockjs, {heartbeat: false, debug: true});
+
+let connect = amqp
+/*
+let bs_mg = function (bs_mq) { 
 	let config = {
-	          sockjs       : new SockJS('http://192.168.1.100:15674/stomp'),
             corr         : generateUuid(),
             hdr_login    : 'test',
             hdr_passcode : 'test'
         };
 
-        let sockjs = config.sockjs;
-        let client = webstomp.over(sockjs, {heartbeat: false, debug: true});
 
         sockjs.addEventListener('message', function(e){
 
@@ -34,7 +38,7 @@
 
         let header={user: config.hdr_login,
                     pass: config.hdr_passcode};
-        client.connect(header,
+        client.connect(user: 'test', pass: 'test',
             function(msg){
                 client.subscribe('/queue/register.elsporko', function(msg){
                     }, {noAck: true});
@@ -57,5 +61,8 @@
             }
         );
             
-        //console.log('client: ' + JSON.stringify(client));
-}(window.bs_mq = window.bs_mq || {}));
+}
+*/
+
+	module.exports = {
+	}

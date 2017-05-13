@@ -111,10 +111,10 @@ let _shipString = function(s) {
 	return r;
 }
 
+
 /*
  * placeShips - Initial placement of ships on the board
  */
-
 let placeShips = function placeShips(){
         /* Randomly place ships on the grid. In order do this each ship must:
 	 *   * Pick an orientation
@@ -134,25 +134,15 @@ let placeShips = function placeShips(){
                 
                 if (fleet.validateShip(ship_string)){
                     fleet.setFleet(start.orientation,
-                             {
-                               type: s.id,
-                               square: 0,
-                               index: s.size
-                             },
-                             start.coordinate);
+                               0,
+                               ship.type,
+                               ship.size,
+                             ship.start_coordinate);
 		       	break;
 		}
             }
-            // Add ship to main matrix
-                
-            //board.adjustBoard(shipsCfg[ship].id);
-            //ships.adjustShip(shipsCfg[ship].id);
-            //ships.displayShip(shipsCfg[ship].id);
-
-            //displayShip(s.id);
         }
 };
-
 
 let displayShip = function (type, current_coord, skip) {
     var shipsCfg = config.ships;
