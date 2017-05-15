@@ -1,3 +1,5 @@
+let ships=require('./ships.js');
+
 let nauticalMap = {}; // Hash lookup that tracks each ship's starting point and current orientation
 
 let buildNauticalChart = function(){
@@ -14,8 +16,9 @@ let buildNauticalChart = function(){
 let nauticalChart = buildNauticalChart(); // Detailed matrix of every ship in the fleet
 
 let getFleet = function(type){
-	let orientation = nauticalMap.type.orientation == 'x' ? 0 : 1;
-	let pieces = nauticalMap.type.start_coord.split('_');
+	let orientation = nauticalMap[type].orientation == 'x' ? 0 : 1;
+
+	let pieces = nauticalMap[type].start_coord.split('_');
 	let ret = new Array;
 
 	while (nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)] == type) {
@@ -24,56 +27,53 @@ let getFleet = function(type){
 	}
 
 	return (ret);
-
-}
-
-let displayShip = function (type, current_coord, skip) {
-    var shipsCfg = config.ships;
-
-    if (typeof current_coord !== undefined){
-        for (coord in current_coord) {
-            setSpace(current_coord[coord], shipsCfg[type].clickClass);
-        }
-    }
-
-    if (!skip){
-        for (coord in shipsCfg[type].coordinates){
-            setSpace(shipsCfg[type].coordinates[coord], shipsCfg[type].clickClass);
-        }
-    }
-}
-
-function setSpace(space, className) {
-    var b = document.getElementById(space); 
-    b.classList.toggle(className);
 }
 
 // TODO - setFleet: Remove previous ship from chart
 /*
  * setFleet - place ship on nautical chart
  */
-let setFleet = function (orientation, square, type, size, target){
-    // Square represents the square on the ship that is the focus of the action
-    var t_pieces = target.split('_');
-    var pieces={
-        "x":t_pieces[0],
-        "y":t_pieces[1],
-    };
+let setFleet = function (orientation, type, size, start_coord){
+    let pieces = start_coord.split('_');
+    let index = (orientation == 'x') ? 0 : 1;
 
-
-    // Get initial target
-    pieces[orientation] = pieces[orientation] - square;
+    delete nauticalMap[type];
     // set the nautical map value for this boat
-    nauticalMap.type={
+    nauticalMap[type]={
 	    orientation: orientation,
-	    start_coord: pieces.x + '_' + pieces.y
+	    start_coord: pieces[0] + '_' + pieces[1]
     };
-
 
     for (var i=0; i < size; i++) {
-	nauticalChart[pieces.x][pieces.y]=type;
-	pieces[orientation]+=1;
+	nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)] = type;
+	pieces[index]= parseInt(pieces[index], 10) +1;
     }
+}
+
+/*
+ * ghostShip - Before putting a ship on the chart it's potential location needs to be plotted so it can be
+ * checked for validity. Given a ship this function will return the potential plotted coordinates. The function
+ * may build coordinates for a known ship or for one moved around on the grid.
+ */
+let ghostShip = function(type, coordinate, orientation, size){
+	let ship = ships.getShip(type);
+	let thisShip = readMap(type);
+	let ghostShip = [];
+	coordinate = coordinate || thisShip.start_coord;
+	orientation = orientation || thisShip.orientation;
+	size = size || ship.size;
+
+	let pieces = coordinate.split('_');
+	let index = (orientation == 'x') ? 0: 1;
+	for (let i=0; i < size; i++) {
+		ghostShip.push(pieces[0] + '_' + pieces[1]);
+		pieces[index] = parseInt(pieces[index], 10) +1;
+	}
+	return ghostShip;
+}
+
+let readMap = function(type){
+	return nauticalMap[type];
 }
 
 /*
@@ -127,27 +127,11 @@ let validateShip = function (coordinates, type){
     return true;
 }
 
-let adjustShip = function (type, callback){
-    var shipsCfg = config.ships;
-
-    // Wipe out existing coordinates
-    shipsCfg[type].coordinates.length=0;
-
-    // Map plotted ships to real coordinates
-    for (var p=0; p < shipsCfg[type].plotted.length; p++) {
-        shipsCfg[type].coordinates[p] = shipsCfg[type].plotted[p];
-    }
-
-    if (typeof callback === "function") {return callback();}
-    return 1;
-}
-
 module.exports = {
-    displayShip: displayShip,
     getFleet: getFleet,
     setFleet: setFleet,
     validateShip: validateShip,
-    adjustShip: adjustShip,
     checkGrid: checkGrid,
-    buildNauticalChart: buildNauticalChart
+    buildNauticalChart: buildNauticalChart,
+    ghostShip: ghostShip
 }

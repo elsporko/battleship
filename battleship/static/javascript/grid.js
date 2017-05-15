@@ -1,12 +1,11 @@
+let fleet = require('./fleet');
+let ships = require('./ships');
+
 /*
  * Build the grid and attach handlers for drag/drop events
  */
-let clickableGrid = function ( rows, cols, callback ){
-    var i=0;
-    var grid = document.createElement('table');
-    //console.log('ships: ' + JSON.stringify(ships));
-    grid.className = 'grid setboard'; // TODO: what is purpose of setboard class? can it be deleted?
-    //grid.className = 'setboard';
+let clickableGrid = function ( rows, cols, isMyGrid){
+    let grid = document.createElement('table');
     for (var r=0;r<rows;++r){
         var tr = grid.appendChild(document.createElement('tr'));
         for (var c=0;c<cols;++c){
@@ -16,32 +15,24 @@ let clickableGrid = function ( rows, cols, callback ){
 
             // Set the ID value of each cell to the row/column value formatted as r_c
             cell.id = r + '_' + c;
-            /* Save this for the gameplay portion. Act on single cell clicks
-            cell.addEventListener('click',(function(el,r,c,i){
-                return function(){
-                    callback(el,r,c,i);
-                }
-            })(cell,r,c,i),false);
-            */
             // Set up drag and drop for each cell.
             cell.setAttribute('draggable','true');
+
+
             cell.addEventListener('dragstart',(
                 function(ev){
                     ev.dataTransfer.effectAllowed='move';
-                    var shipCfg = config.ships;
-                    var pieces=this.id.split('_');
-                    var type = board.spaces[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)].type;
+		    let type = fleet.checkGrid(this.id);
+		    let ship = ships.getShip(type);
 
                     // Calculate which square was clicked to guide placement
-                    var square = _find_square(this.id, shipCfg[type].orientation, shipCfg[type].size);
+                    var start_coord = _find_start(this.id, ship.orientation, ship.size);
                     ev.dataTransfer.setData("text/plain", 
                         JSON.stringify({
-                                        square :square,
-                                        index  :shipCfg[type].size,
+                                        square :start_coord,
+                                        index  :ship.size,
                                         type   :type,
-                                        current_coord:shipCfg[type].coordinates
-                                        //type   :board.spaces[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)].type,
-                                        //"orientation": this.orientation
+                                        current_coord: fleet.ghostShip(type, start_coord)
                                        })
                         );
                 })
@@ -50,21 +41,18 @@ let clickableGrid = function ( rows, cols, callback ){
             // Add Drag/Drop capabilities
             cell.addEventListener('drop',(
                 function(ev){
-                    var shipCfg = config.ships;
                     console.log('dropping');
                     var dropObj = JSON.parse(ev.dataTransfer.getData("text/plain"));
-                    //console.log('dropObj: ' + JSON.stringify(dropObj));
-                    var ship=shipCfg[dropObj.type];
-                    console.log('ship: '  + JSON.stringify(ship));
-                    console.log('drop target: ' + JSON.stringify(ev.target.id));
+                    let ship=ships.getShip(dropObj.type);
 
-                    //var current_coord=shipCfg[dropObj.type].coordinates;
-                    console.log('current coord: ' + JSON.stringify(dropObj.current_coord));
-                    ships.plotShip(ship.orientation, dropObj, ev.target.id);
-                    if(ships.validateShip(dropObj.type)) {
-                        board.adjustBoard(dropObj.type);
-                        ships.adjustShip(dropObj.type);
-                        ships.displayShip(dropObj.type, dropObj.current_coord);
+                    if(ships.validateShip(dropObj.type, dropObj.current_coord)) {
+			    // Remove initial image
+			    _displayShip(type, current_coord, skip);
+
+			    fleet.setFleet (fleet.readMap(DropObj.type), DropObj.type, ship.size, dropObj.current_coord); // (orientation, type, size, start_coord)
+
+			    // Redraw image in new location
+			    _displayShip(type, current_coord, skip);
                     }
 
                     ev.stopPropagation();
@@ -84,69 +72,66 @@ let clickableGrid = function ( rows, cols, callback ){
                 ));
 
             cell.addEventListener('click', (function(e){
-                var shipCfg = config.ships;
-                var pieces=this.id.split('_');
-                var type = board.spaces[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)].type;
-                //console.log('1--ship' + JSON.stringify(shipCfg[type]));
-                //var current_coord=shipCfg[type].coordinates;
+		let type = fleet.checkGrid(this.id);
+		let thisShip = fleet.checkGrid(type);
+		let ship = ship.getShip(type);
+		let orientation = (thisShip.orientation == 'x') ? 'y':'x';
+		let ghost = fleet.ghostShip('type', _find_start(this.id, orientation, ship.size );
 
-                // Calculate which square was clicked to guide placement
-                var square = _find_square(this.id, shipCfg[type].orientation, shipCfg[type].size);
-                var oMap = {x: 'y', y: 'x'};
-                shipCfg[type].orientation = oMap[shipCfg[type].orientation];
-                //console.log('click current_coord' + JSON.stringify(current_coord));
-                console.log('ship' + JSON.stringify(shipCfg[type]));
+                if (ships.validateShip(type, ghost)) {
+		    // Remove initial image
+		    _displayShip(type, current_coord, skip);
 
-                var current_coord=shipCfg[type].coordinates;
+		    fleet.setFleet (fleet.readMap(DropObj.type), DropObj.type, ship.size, dropObj.current_coord);
 
-                ships.plotShip(shipCfg[type].orientation,
-                                           {type: shipCfg[type].id, 
-                                            square: square,
-                                            index: shipCfg[type].size},
-                               this.id);
-                //console.log('2--ship' + JSON.stringify(shipCfg[type]));
-                //console.log('current_coord: ' + JSON.stringify(current_coord));
-
-                if (ships.validateShip(shipCfg[type].id)) {
-                    board.adjustBoard(shipCfg[type].id);
-                    ships.adjustShip(shipCfg[type].id);
-                    ships.displayShip(shipCfg[type].id, current_coord, 1);
-                } else {
-                    // Reset change to orientation
-                    shipCfg[type].orientation = oMap[shipCfg[type].orientation]
+		    // Redraw image in new location
+		    _displayShip(type, current_coord, skip);
                 }
 
                 }));
         }
     }
-
     return grid;
 }
 
-function _find_square(start_pos, orientation, size){
-    // beginning at start_pos traverse the ship according to the board struct
-    // until the endpoint is hit. The value of square=size of ship - number of squares
-    // to the end point.
-    var t_pieces=start_pos.split('_');
-    var pieces={
-        "x":t_pieces[0],
-        "y":t_pieces[1],
-    };
-    var type = board.spaces[pieces.x][pieces.y].type;
-    var i;
+/*
+ * _find_start - Determine the starting coordinate of a ship given the square that was clicked. For example
+ * it is possible that a battleship along the x-axis was clicked at location 3_3 but that was the second square
+ * on the ship. This function will identify that the battleship starts at 2_3.
+ */
 
-    for (i=0; i < size; i++) {
-        if (board.spaces[pieces.x] &&
-            board.spaces[pieces.x][pieces.y] &&
-            type == board.spaces[pieces.x][pieces.y].type){
-            pieces[orientation]++;
+function _find_start(start_pos, orientation, size){
+    let type = fleet.checkGrid(this.id);
+    let ship = ships.getShip(type);
+    let index = eorientation == 'x') ? 0 : 1;
+
+    let pieces=start_pos.split('_');
+
+    for (let i=0; i < size; i++) {
+	let g = fleet.checkGrid(pieces[0] + '_' + pieces[1]);
+        if (g != undefined && g == type){
+            pieces[index]++;
         } else {
             break;
         }
     }
 
-//    return size - i + 1;
-    return size - i;
+    start = start_pos.split('_');
+    start[index] = start[index] - (size - i);
+    return start[0] + '_' + start[1];
+}
+
+function _displayShip(type) {
+    let coordinates = fleet.getFleet(type);
+
+    for (coord in coordinates) {
+        setSpace(coordinates[coord], shipsCfg[type].clickClass);
+    }
+}
+
+function _setSpace(space, className) {
+    var b = document.getElementById(space); 
+    b.classList.toggle(className);
 }
 
 module.s=exports={

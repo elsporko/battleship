@@ -71,6 +71,11 @@ let buildShips = function (){
 return ships;
 }
 
+let buildShip = function(type){
+        ships[type] = _ship(ship_config[type].size, ship_config[type].id, ship_config[type].color, ship_config[type].clickClass, ship_config[type].label);
+	return ships;
+}
+
 // Set value in ship object. 
 let setShip = function(type, key, value){
         if (type && ships[type] && key) { // only attempt an update if there is a legit ship type and a key
@@ -80,8 +85,8 @@ let setShip = function(type, key, value){
 
 // Return ship object if no type given otherwise return object containing just requested ship
 let getShip = function (type){
-    if(!type){
-        return ships.type;
+    if(type){
+        return ships[type];
     } else {
         return ships;
     }
@@ -95,7 +100,7 @@ function _getStartCoordinate(){
     return {coordinate: start_x + '_' + start_y, orientation: start_orienation > 5 ? 'x' : 'y'};
 }
 
-
+// FIXME Does fleet.ghostShip do this now?
 // Build an array of coordinates for a ship based on it's orientation, intended start point and size
 let _shipString = function(s) {
 	const o = s.orientation;
@@ -134,7 +139,6 @@ let placeShips = function placeShips(){
                 
                 if (fleet.validateShip(ship_string)){
                     fleet.setFleet(start.orientation,
-                               0,
                                ship.type,
                                ship.size,
                              ship.start_coordinate);
@@ -144,26 +148,11 @@ let placeShips = function placeShips(){
         }
 };
 
-let displayShip = function (type, current_coord, skip) {
-    var shipsCfg = config.ships;
-
-    if (typeof current_coord !== undefined){
-        for (coord in current_coord) {
-            setSpace(current_coord[coord], shipsCfg[type].clickClass);
-        }
-    }
-
-    if (!skip){
-        for (coord in shipsCfg[type].coordinates){
-            setSpace(shipsCfg[type].coordinates[coord], shipsCfg[type].clickClass);
-        }
-    }
-}
 
 module.exports = {
     buildShips: buildShips,
+    buildShip: buildShip,
     getShip: getShip,
     setShip: setShip,
     placeShips: placeShips,
-    displayShip: displayShip
 }
