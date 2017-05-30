@@ -76,7 +76,7 @@ let clickableGrid = function ( rows, cols, isMyGrid){
 		let thisShip = fleet.checkGrid(type);
 		let ship = ship.getShip(type);
 		let orientation = (thisShip.orientation == 'x') ? 'y':'x';
-		let ghost = fleet.ghostShip('type', _find_start(this.id, orientation, ship.size );
+		let ghost = fleet.ghostShip('type', _find_start(this.id, orientation, ship.size ));
 
                 if (ships.validateShip(type, ghost)) {
 		    // Remove initial image
@@ -103,7 +103,7 @@ let clickableGrid = function ( rows, cols, isMyGrid){
 function _find_start(start_pos, orientation, size){
     let type = fleet.checkGrid(this.id);
     let ship = ships.getShip(type);
-    let index = eorientation == 'x') ? 0 : 1;
+    let index = (orientation == 'x') ? 0 : 1;
 
     let pieces=start_pos.split('_');
 
@@ -121,20 +121,23 @@ function _find_start(start_pos, orientation, size){
     return start[0] + '_' + start[1];
 }
 
-function _displayShip(type) {
+let displayShip = function (ships, type) {
     let coordinates = fleet.getFleet(type);
+    let ship = ships.getShip(type);
 
     for (coord in coordinates) {
-        setSpace(coordinates[coord], shipsCfg[type].clickClass);
+        _setSpace(coordinates[coord], ship.clickClass);
     }
 }
 
 function _setSpace(space, className) {
     var b = document.getElementById(space); 
+    //b.toggle(className);
     b.classList.toggle(className);
 }
 
-module.s=exports={
+module.exports={
     clickableGrid: clickableGrid,
+    displayShip: displayShip
 }
 

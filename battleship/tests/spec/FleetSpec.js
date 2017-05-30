@@ -71,4 +71,3 @@ describe("Check ghost ship is properly built", function(){
     });
 });
 
-

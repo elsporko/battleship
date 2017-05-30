@@ -1,4 +1,4 @@
-let ships=require('./ships.js');
+var ships=require('./ships.js');
 
 let nauticalMap = {}; // Hash lookup that tracks each ship's starting point and current orientation
 
@@ -7,7 +7,7 @@ let buildNauticalChart = function(){
 	for(let i=0; i < 10; i++) {
 		chart[i] = new Array;
 		for (let j=0; j < 10; j++){
-			chart[i][j] = new Array;
+			chart[i][j] = undefined;//new Array;
 		}
 	}
 	return chart;
@@ -29,7 +29,15 @@ let getFleet = function(type){
 	return (ret);
 }
 
-// TODO - setFleet: Remove previous ship from chart
+let getWholeFleet = function(){
+	let ret={};
+	for (t in nauticalMap) {
+		ret[t] = getFleet(t);
+	}
+	return ret;
+}
+
+// TODO - setFleet: Remove previous ship from chart -- may be done...needs test
 /*
  * setFleet - place ship on nautical chart
  */
@@ -58,7 +66,7 @@ let setFleet = function (orientation, type, size, start_coord){
 let ghostShip = function(type, coordinate, orientation, size){
 	let ship = ships.getShip(type);
 	let thisShip = readMap(type);
-	let ghostShip = [];
+	let ghost = [];
 	coordinate = coordinate || thisShip.start_coord;
 	orientation = orientation || thisShip.orientation;
 	size = size || ship.size;
@@ -66,11 +74,11 @@ let ghostShip = function(type, coordinate, orientation, size){
 	let pieces = coordinate.split('_');
 	let index = (orientation == 'x') ? 0: 1;
 	for (let i=0; i < size; i++) {
-		ghostShip.push(pieces[0] + '_' + pieces[1]);
+		ghost.push(pieces[0] + '_' + pieces[1]);
 		pieces[index] = parseInt(pieces[index], 10) +1;
 	}
-	return ghostShip;
-}
+	return ghost;
+};
 
 let readMap = function(type){
 	return nauticalMap[type];
@@ -85,21 +93,24 @@ let checkGrid = function(coordinates){
 		let ret = new Array;
 		for(c in coordinates){
 			let s = _setChart(coordinates[c]);
-			if (s == false) {return false};
+			if (s === false) {return false};
 			ret.push (s);
 		}
 		return ret;
 	} else {
 		return _setChart(coordinates);
 	}
-}
+};
 
 let _setChart = function(coordinate){
 	let pieces = coordinate.split('_');
-	if (nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)] == undefined) {return false}
+	if (parseInt(pieces[0], 10) >= nauticalChart.length ||
+	    parseInt(pieces[1], 10)>= nauticalChart[parseInt(pieces[0], 10)].length) {
+		return false;
+	}
 
 	return nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)];
-}
+};
 
 /* 
  * Given a list of coordinates and a ship type validate that the coordinates do not violate the rules of:
@@ -125,11 +136,12 @@ let validateShip = function (coordinates, type){
 	}
     }
     return true;
-}
+};
 
 module.exports = {
     getFleet: getFleet,
     setFleet: setFleet,
+    getWholeFleet: getWholeFleet,
     validateShip: validateShip,
     checkGrid: checkGrid,
     buildNauticalChart: buildNauticalChart,

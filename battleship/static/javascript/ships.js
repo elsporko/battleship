@@ -1,4 +1,5 @@
-let fleet = require ('./fleet.js');
+var fleet=require('./fleet.js');
+
 // Config settings 
 let ship_config = {
     aircraftCarrier : {
@@ -66,7 +67,12 @@ let shipIint = function(){
 // Public function to initially create ships object
 let buildShips = function (){
     for (let s in ship_config){
-        ships.s = _ship(ship_config[s].size, ship_config[s].id, ship_config[s].color, ship_config[s].clickClass, ship_config[s].label);
+        ships[s] = {size: ship_config[s].size, 
+		    type: ship_config[s].id,
+	            color: ship_config[s].color,
+		    clickClass: ship_config[s].clickClass,
+		    label: ship_config[s].label
+	           };
     }
 return ships;
 }
@@ -93,11 +99,21 @@ let getShip = function (type){
 }
 
 // Private function to randomly determine ship's orientation along the X-axis or Y-axis. Only used when plotting ships for the first time.
-function _getStartCoordinate(){
-    var start_x=Math.floor(Math.random()*11);
-    var start_y=Math.floor(Math.random()*11);
-    var start_orientation=Math.floor(Math.random()*10);
-    return {coordinate: start_x + '_' + start_y, orientation: start_orienation > 5 ? 'x' : 'y'};
+function _getStartCoordinate(size){
+    const start_orientation=Math.floor(Math.random()*10) > 5 ? 'x' : 'y';
+    const start_x = start_orientation == 'x' ? _getRandomCoordinate(size) : _getRandomCoordinate(0);
+    const start_y = start_orientation == 'y' ? _getRandomCoordinate(size) : _getRandomCoordinate(0);
+
+    return {coordinate: start_x + '_' + start_y, orientation: start_orientation};
+}
+
+// Take ship size and orientation into account when determining the start range value. ex. don't
+// let an aircraft carrier with an orientation of 'X' start at row 7 because it will max out over the
+// grid size.
+function _getRandomCoordinate(offset){
+    const MAX_COORD = 10;
+    return Math.floor(Math.random()*(MAX_COORD - offset));
+
 }
 
 // FIXME Does fleet.ghostShip do this now?
@@ -120,7 +136,7 @@ let _shipString = function(s) {
 /*
  * placeShips - Initial placement of ships on the board
  */
-let placeShips = function placeShips(){
+let placeShips = function placeShips(fleet){
         /* Randomly place ships on the grid. In order do this each ship must:
 	 *   * Pick an orientation
 	 *   * Pick a starting coordinate
@@ -129,23 +145,24 @@ let placeShips = function placeShips(){
 	 *   	* Save start coord and orientation as part of ship object
 	 *   	* Plot ship on master matrix
 	 */
-        for (var ship in getShip()) {
+	let shipList = getShip();
+        for (var ship in shipList) {
             
-            while (true) {
-                const start = _getStartCoordinate(); 
-		ship.orientation = start.orientation;
-		ship.start_coordinate = start.coordinate;
-		const ship_string = _shipString(ship);
-                
-                if (fleet.validateShip(ship_string)){
-                    fleet.setFleet(start.orientation,
-                               ship.type,
-                               ship.size,
-                             ship.start_coordinate);
-		       	break;
+            let start = _getStartCoordinate(shipList[ship].size); 
+	    let ship_string = fleet.ghostShip(shipList[ship].type, start.coordinate, start.orientation);
+	    shipList[ship].orientation = start.orientation;
+
+            while (!fleet.validateShip(ship_string)) {
+                start = _getStartCoordinate(shipList[ship].size); 
+		shipList[ship].orientation = start.orientation;
+		ship_string = fleet.ghostShip(shipList[ship].type, start.coordinate, start.orientation);
 		}
+
+            fleet.setFleet(start.orientation,
+                       shipList[ship].type,
+                       shipList[ship].size,
+                       start.coordinate);
             }
-        }
 };
 
 
@@ -154,5 +171,5 @@ module.exports = {
     buildShip: buildShip,
     getShip: getShip,
     setShip: setShip,
-    placeShips: placeShips,
+    placeShips: placeShips
 }
