@@ -118,8 +118,6 @@ let _setChart = function(coordinate){
  * 	* ship must not occupy the same square as any other ship
  */
 let validateShip = function (coordinates, type){
-
-
     // Make sure there are no other boats already on any a space
     for (var p=0; p < coordinates.length; p++) {
 

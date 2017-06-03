@@ -10,7 +10,7 @@ player.register('elsporko');
 // Set up grid
 //let g = document.getElementById('myGrid');
 //g.appendChild(grid.clickableGrid(10, 10));
-document.body.appendChild(grid.clickableGrid(10, 10));
+document.body.appendChild(grid.clickableGrid(10, 10, ships, fleet));
 
 
 /* Set random fleet */
