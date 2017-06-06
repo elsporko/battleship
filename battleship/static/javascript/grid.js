@@ -27,14 +27,15 @@ let clickableGrid = function ( rows, cols, ships, fleet){
 		    let ship = ships.getShip(type);
 
                     // Calculate which square was clicked to guide placement
-                    var start_coord = _find_start(this.id, ship.orientation, ship.size, type);
+                    let start = _find_start(this.id, ship.orientation, ship.size, type);
                     ev.dataTransfer.setData("text/plain", 
                         JSON.stringify({
-                                        square :start_coord,
-                                        index  :ship.size,
-                                        type   :type,
-                                        current_coord: fleet.ghostShip(type, start_coord),
-				        orientation: ship.orientation
+                                        offset:        start.offset,
+				        start_coord:   start.start_coord,
+                                        index:         ship.size,
+                                        type:          type,
+                                        current_coord: fleet.ghostShip(type, start.start_coord),
+				        orientation:   ship.orientation
                                        })
                     );
                 })
@@ -44,17 +45,20 @@ let clickableGrid = function ( rows, cols, ships, fleet){
             cell.addEventListener('drop',(
                 function(ev){
                     console.log('dropping');
-                    var dropObj = JSON.parse(ev.dataTransfer.getData("text/plain"));
+                    let dropObj = JSON.parse(ev.dataTransfer.getData("text/plain"));
+		    console.log('current coord: ', dropObj.current_coord);
                     let ship=ships.getShip(dropObj.type);
 
-                    if(fleet.validateShip(dropObj.current_coord, dropObj.type)) {
+		    let dropShip = fleet.ghostShip(dropObj.type, ev.target.id, dropObj.orientation, ship.size, dropObj.offset);
+
+                    if(fleet.validateShip(dropShip, dropObj.type)) {
 			    // Remove initial image
 			    displayShip(ships, dropObj.type);
 
-			    fleet.setFleet (dropObj.orientation, dropObj.type, ship.size, dropObj.square); 
+			    fleet.setFleet (dropObj.orientation, dropObj.type, ship.size, ev.target.id, dropObj.offset); 
 
 			    // Redraw image in new location
-			    displayShip(dropObj.type, dropObj.current_coord);
+			    displayShip(ships, dropObj.type);
                     }
 
                     ev.stopPropagation();
@@ -73,22 +77,23 @@ let clickableGrid = function ( rows, cols, ships, fleet){
                     }
                 ));
 
-            cell.addEventListener('click', (function(e){
-		let type = fleet.checkGrid(this.id);
-		let ship = ship.getShip(type);
-		let orientation = (thisShip.orientation == 'x') ? 'y':'x';
-		let ghost = fleet.ghostShip(type, _find_start(this.id, orientation, ship.size));
+            cell.addEventListener('click', (
+		function(e){
+		    let type = _getTypeByClass(ships, this.className);
+		    let ship = ships.getShip(type);
+		    let orientation = (ship.orientation == 'x') ? 'y':'x'; // flip the orientation
+                    let start = _find_start(e.target.id, orientation, ship.size, type);
+		    let ghost = fleet.ghostShip(type, e.target.id, orientation, ship.size, start.offset);
 
-                if (ships.validateShip(type, ghost)) {
-		    // Remove initial image
-		    displayShip(ships, type);
-
-		    fleet.setFleet (fleet.readMap(dropObj.type), dropObj.type, ship.size, dropObj.current_coord);
-
-		    // Redraw image in new location
-		    displayShip(ships, type);
-                }
-
+                    if(fleet.validateShip(ghost, type)) {
+		        // Remove initial image
+		        displayShip(ships, type);
+    
+		        fleet.setFleet (orientation, type, ship.size, e.target.id); 
+    
+		        // Redraw image in new location
+		        displayShip(ships, type);
+                    }
                 }));
         }
     }
@@ -105,18 +110,21 @@ function _find_start(start_pos, orientation, size, type){
     let index = (orientation == 'x') ? 0 : 1;
 
     let pieces=start_pos.split('_');
+    let offset = 0;
 
     for (i=0; i < size; i++) {
+	if (pieces[index] == 0) {break;}
         pieces[index]--;
 	let g = fleet.checkGrid(pieces[0] + '_' + pieces[1]);
         if (g != undefined && g == type && g != false){
+	    offset++;
             start_pos = pieces[0] + '_' + pieces[1];
         } else {
             break;
         }
     }
 
-    return start_pos;
+    return {start_pos: start_pos, offset: offset};
 }
 
 let displayShip = function (ships, type) {

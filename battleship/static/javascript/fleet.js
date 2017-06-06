@@ -41,11 +41,20 @@ let getWholeFleet = function(){
 /*
  * setFleet - place ship on nautical chart
  */
-let setFleet = function (orientation, type, size, start_coord){
+let setFleet = function (orientation, type, size, start_coord, offset){
     let pieces = start_coord.split('_');
     let index = (orientation == 'x') ? 0 : 1;
 
-    delete nauticalMap[type];
+    offset = offset || 0;
+
+    // Adjust for drag/drop when player picks a ship piece other than the head.
+    pieces[index] = parseInt(pieces[index], 10) - offset;
+
+    /*
+     * Remove old ship from nauticalChart/Map
+     */
+    _clearShip(type, size);
+
     // set the nautical map value for this boat
     nauticalMap[type]={
 	    orientation: orientation,
@@ -58,21 +67,39 @@ let setFleet = function (orientation, type, size, start_coord){
     }
 }
 
+function _clearShip(type, size){
+    let map = nauticalMap[type];
+    if (map === undefined){return false;}
+
+    let pieces = map.start_coord.split('_');
+    let index = (map.orientation == 'x') ? 0 : 1;
+
+    for (i=0; i < size; i++) {
+	    nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)]=undefined;
+	    pieces[index]++;
+    }
+
+    delete nauticalMap[type];
+
+}
+
 /*
  * ghostShip - Before putting a ship on the chart it's potential location needs to be plotted so it can be
  * checked for validity. Given a ship this function will return the potential plotted coordinates. The function
  * may build coordinates for a known ship or for one moved around on the grid.
  */
-let ghostShip = function(type, coordinate, orientation, size){
+let ghostShip = function(type, coordinate, orientation, size, offset){
 	let ship = ships.getShip(type);
 	let thisShip = readMap(type);
 	let ghost = [];
 	coordinate = coordinate || thisShip.start_coord;
 	orientation = orientation || thisShip.orientation;
 	size = size || ship.size;
+	offset = offset || 0;
 
 	let pieces = coordinate.split('_');
 	let index = (orientation == 'x') ? 0: 1;
+	pieces[index] = parseInt(pieces[index], 10) - offset;
 	for (let i=0; i < size; i++) {
 		ghost.push(pieces[0] + '_' + pieces[1]);
 		pieces[index] = parseInt(pieces[index], 10) +1;
@@ -126,11 +153,10 @@ let validateShip = function (coordinates, type){
 	
 	if (grid == false) {return false}; // If checkGrid returns false coordinates are out of range
 
-	for (g in grid) {
-		// Fail if the grid space contains neither the current ship value or NULL
-		if (grid[g] != type && !grid[g]) {
-			return false
-		}
+	for (c in coordinates) {
+		let pieces = coordinates[c].split('_');
+		if (nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)] != type &&
+		    nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)] != undefined) {return false};
 	}
     }
     return true;
