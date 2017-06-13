@@ -3,9 +3,12 @@ let fleet = require('./fleet.js');
 
 let playerRoster = new Object; // Placeholder for all players in the game
 let playerOrder = []; // Order of player turn
+//let playerMove = [];
 
 let me;
 let orderIndex=0;
+let flow=['register','game'];
+let currentFlow;
 
 // Register handle
 let register = function(handle){
@@ -19,22 +22,18 @@ let register = function(handle){
 
 	//_populate_playerOrder('elsporko', 0);
 	playerOrder[reg.order] = reg.handle;
-}
-
-/*
- *  One consideration is for the registration service to provide a random number for order value so that player order is not
- *  necessarily FIFO. Also there is no guarantee that player order values will arrive in consecutive order so there needs to
- *  be a sort mechanism.
- */
-let _populate_playerOrder = function(handle, order){
+	gameFlow();
+	return;
 }
 
 //Accept registration from other players
-let acceptReg = function(handle, order){
+let acceptReg = function(handle, order, grid, ships, fleet, player){
 	playerOrder[order] = handle;
 	playerRoster = {
 		[handle]: {grid: fleet.buildNauticalChart}
 	}
+	let pg = document.getElementById('playerGrid');
+	pg.appendChild(grid.clickableGrid(10, 10, ships, fleet, player, handle));
 }
 
 let myTurn = function() {
@@ -53,10 +52,33 @@ let currentPlayer = function(){
 let playerMove = function(){
 }
 
+let gameFlow = function(){
+	if (currentFlow != undefined){
+		document.getElementById(flow[currentFlow]).style.display='none';
+		currentFlow++;
+	} else {
+		currentFlow = 0;
+	}
+	document.getElementById(flow[currentFlow]).style.display='inline';
+}
+
+let playerCanMove = function() {
+	if (playerOrder.length - 1 > playerMove.length) return true;
+
+	return false;
+}
+
+let playerClearMove = function() {
+	player = [];
+}
+
 module.exports = {
     register: register,
     acceptReg: acceptReg,
     myTurn: myTurn,
     currentPlayer: currentPlayer,
-    nextPlayer: nextPlayer
+    nextPlayer: nextPlayer,
+    gameFlow: gameFlow,
+    playerCanMove: playerCanMove,
+    playerClearMove: playerClearMove 
 }

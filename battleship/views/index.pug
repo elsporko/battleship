@@ -5,43 +5,38 @@ html
     script(src='//cdn.jsdelivr.net/sockjs/1/sockjs.min.js')
     script(src='javascript/webstomp.min.js')
   body
-    #binit
+    #register(style={ display:'none'})
       form
         p Handle:
         input(placeholder="Who are you")
+        p
+        #register Register
 
-    #setbord
-      section#instructions
-      p <strong>Set initial fleet</strong>
--       list=["Drag boat to reposition", "Click boat to change course heading (East/West <-> North/South)"]
-      ul
-      each item in list
-          li=item          
-      section#grid
-        aside#shiplist
-          p.shiplabel.acclickedlbl Aircraft Carrier
-          p.shiplabel.bsclickedlbl Battleship
-          p.shiplabel.declickedlbl Destroyer
-          p.shiplabel.suclickedlbl Submarine
-          p.shiplabel.pbclickedlbl Patrol Boat
+    #game(style={ display:'none'})
+      p Directions
+      ul Moving your own fleet
+        li Drag boat to reposition
+        li Click boat to change course heading (East/West <-> North/South)
 
-      //script(type=javascript).
-        //console.log('client: ' + JSON.stringify(client));
+      ul Offense
+        li Click opponent's grid to attack
+        li Drag mine onto opponent's grid to set a mine at that location
+
+      aside#shiplist
+        p.shiplabel.acclickedlbl Aircraft Carrier
+        p.shiplabel.bsclickedlbl Battleship
+        p.shiplabel.declickedlbl Destroyer
+        p.shiplabel.suclickedlbl Submarine
+        p.shiplabel.pbclickedlbl Patrol Boat
+
+      #myGrid
+        form
+        #playerGrid
+        #Megan Register Megan
+        #Ryan Register Ryan
+
+    script(src='javascript/bship.js')
+
 
         // Connect to RabbitMQ
         //bs_mq.connect();
-        //var grid=clickableGrid(10,10);
-        //document.body.appendChild(grid);
-        //ships.placeShips();
-
-        // Set up grid
-     
-        //document.body.appendChild(grid.clickableGrid());
-
-      #myGrid 
-      form
-        p
-        button(value="Play Game" name="playGame" id="playGame") Play Game
-
-      script(src='javascript/bship.js')
-
