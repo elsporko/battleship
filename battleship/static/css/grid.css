@@ -3,7 +3,7 @@ table.grid { margin:1em auto; border-collapse:collapse;
         border:1px solid #ccc;
         box-sizing:border-box;
         cursor:pointer;
-        float: left;
+        /*float: left;*/
         font-family:sans-serif;
         font-size:13px;
         text-align:center;
@@ -36,14 +36,6 @@ table.grid { margin:1em auto; border-collapse:collapse;
     border-collapse:collapse;
 }
 
-.binit{
-    display:none;
-}
-
-.setboard{
-    /*display:none;*/
-}
-
 .acclickedlbl{
     color:Crimson;
     border: none;
@@ -72,22 +64,22 @@ div.declicked, td.declicked {
     border:none;
 }
 .suclickedlbl {
-    color:DarkRed;
+    color:Gold;
     border:none;
 }
 div.suclicked, td.suclicked {
-    background-color:DarkRed;
-    color:DarkRed;
+    background-color:Gold;
+    color:Gold;
     border:none;
     border:none;
 }
 .pbclickedlbl {
-    color:Gold;
+    color:DarkRed;
     border:none;
 }
 div.pbclicked, td.pbclicked {
-    background-color:Gold;
-    color:Gold;
+    background-color:DarkRed;
+    color:DarkRed;
     border:none;
 }
 div.instructions{

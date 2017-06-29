@@ -13,30 +13,42 @@ html
         #register Register
 
     #game(style={ display:'none'})
-      p Directions
-      ul Moving your own fleet
-        li Drag boat to reposition
-        li Click boat to change course heading (East/West <-> North/South)
+      section#gameDialog Game Action
+      #doMoves Execute Moves
+      div(id="playContainer" startwidth="114" startheight="134" startleft="195" startright="134")
+        #playOrder
+      section#directions
+        p Directions
+        ul Moving your own fleet
+          li Drag boat to reposition
+          li Click boat to change course heading (East/West <-> North/South)
 
-      ul Offense
-        li Click opponent's grid to attack
-        li Drag mine onto opponent's grid to set a mine at that location
+        ul Offense
+          li Click opponent's grid to attack
+          li Drag mine onto opponent's grid to set a mine at that location
 
-      aside#shiplist
-        p.shiplabel.acclickedlbl Aircraft Carrier
-        p.shiplabel.bsclickedlbl Battleship
-        p.shiplabel.declickedlbl Destroyer
-        p.shiplabel.suclickedlbl Submarine
-        p.shiplabel.pbclickedlbl Patrol Boat
+        section#shiplist
+          p.shiplabel.acclickedlbl Aircraft Carrier
+          p.shiplabel.bsclickedlbl Battleship
+          p.shiplabel.declickedlbl Destroyer
+          p.shiplabel.suclickedlbl Submarine
+          p.shiplabel.pbclickedlbl Patrol Boat
 
-      #myGrid
-        form
-        #playerGrid
-        #Megan Register Megan
-        #Ryan Register Ryan
+        section#attack(style={display:'none'}) Moves
+
+      section#myGrid
+
+      section#setFleet Click here once initial fleet has been set
+      p
+
+      section#playerGrid(style={display:'none'})
+      #MeganReg Register Megan
+      #RyanReg Register Ryan
+      #TraceyReg Register Tracey
 
     script(src='javascript/bship.js')
 
 
         // Connect to RabbitMQ
         //bs_mq.connect();
+        // <iframe src ="./shoutbox_messages_list.php?game_id=108814" frameborder='0' style="padding:0; margin:0; width:100%; height:300px"></iframe>
