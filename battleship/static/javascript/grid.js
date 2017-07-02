@@ -18,7 +18,7 @@ let clickableGrid = function ( rows, cols, ships, fleet, player, phandle){
             cell.id = r + '_' + c;
 
             if (phandle == undefined){
-                _setMyListeners(cell, ships, fleet)
+                _setMyListeners(cell, ships, fleet, player)
 	    } else {
                _setPlayerListeners(player, cell, phandle);
 	    }
@@ -27,7 +27,7 @@ let clickableGrid = function ( rows, cols, ships, fleet, player, phandle){
     return grid;
 }
 
-function _setMyListeners(cell, ships, fleet){
+function _setMyListeners(cell, ships, fleet, player){
             // Set up drag and drop for each cell.
             cell.setAttribute('draggable','true');
 
@@ -71,6 +71,8 @@ function _setMyListeners(cell, ships, fleet){
 
 			    // Redraw image in new location
 			    displayShip(ships, dropObj.type);
+
+		 	    player.setMove({type: 'move', coordinate: ev.target.id});
                     }
 
                     ev.stopPropagation();
@@ -105,6 +107,7 @@ function _setMyListeners(cell, ships, fleet){
     
 		        // Redraw image in new location
 		        displayShip(ships, type);
+		 	player.setMove({type: 'pivot', coordinate: e.target.id});
                     }
                 }));
 }
@@ -116,8 +119,8 @@ function _setPlayerListeners(player, cell, handle){
 
             cell.addEventListener('click', (
 		function(e){
-		    if(player.playerCanMove()) {
-		        player.setPlayerMove({type: 'attack',
+		    if(player.canMove()) {
+		        player.setMove({type: 'attack',
 			                      coordinate: e.target.id});
 		        console.log( e.target.id + ' is under attack');
                     }

@@ -3,6 +3,7 @@ var player = require('./player.js');
 var ships = require('./ships.js');
 var fleet = require('./fleet.js');
 var config = require('./config.js');
+let gameOn = false;
 
 
 player.gameFlow();
@@ -25,8 +26,20 @@ f.addEventListener('click',
 	    return;
     }, false);
 
+// Set up link to resolve orders
+let d=document.getElementById('doMoves');
+d.addEventListener('click',
+	function(){
+		// Resolve orders
+		player.resolveOrders();
+		// Reset moves
+		player.playerClearMove();
+		// Turn moves over to the next player
+		// FIXME - Simulating moves for now. Remove when ready for realsies
+
+	}, false);
 // Set up grid
-document.getElementById('myGrid').appendChild(grid.clickableGrid(10, 10, ships, fleet));
+document.getElementById('myGrid').appendChild(grid.clickableGrid(10, 10, ships, fleet, player));
 
 // Set up drag/drop of moves
 //document.getElementById('playOrder').setAttribute('draggable','true');
@@ -76,10 +89,9 @@ while (1) {
 }
 */
 
-
 function playGame(){
+	player.setGameOn();
 	if (player.myTurn()){
-
 		//window.open('','attack', 'height=200,width=200,menubar=no,status=no,titlebar=no,toolbar=no', false );
 	}
 }
