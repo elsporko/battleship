@@ -9,17 +9,8 @@ let me;
 let orderIndex=0;
 let flow=['register','game'];
 let currentFlow;
-let gameOn=false;
-let setGameOn = function(){
-	gameOn = true;
-}
-
-let getGameOn = function(){
-	return gameOn;
-}
 
 let canMove = function() {
-	//if (playerOrder.length > playerMove.length) return true;
 	if (playerOrder.length > move.getMoveSize()) return true;
 
 	return false;
@@ -90,9 +81,7 @@ module.exports = {
     currentPlayer: currentPlayer,
     nextPlayer: nextPlayer,
     gameFlow: gameFlow,
-    setGameOn: setGameOn,
     canMove: canMove,
-    getGameOn: getGameOn,
     setMove: setMove
     //displayMoveOrder: displayMoveOrder;
 }

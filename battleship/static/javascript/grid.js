@@ -1,6 +1,36 @@
 let fleet = require('./fleet');
 let ships = require('./ships');
 
+let moveShip = function(ships, dropObj, ev, fleet, player){
+    console.log('pre-set fleet move');
+    let ship=ships.getShip(dropObj.type);
+    // Remove initial image
+    displayShip(ships, dropObj.type);
+
+    fleet.setFleet (dropObj.orientation, dropObj.type, ship.size, ev.target.id, dropObj.offset); 
+
+    // Redraw image in new location
+    displayShip(ships, dropObj.type);
+}
+
+/*
+ * Called after player sets initial fleet. Overwrite the moveShip function so it behaves different.
+ */
+let setMoveShip = function(){
+	/* change value of moveShip function */
+	moveShip = function(ships, dropObj, ev, fleet, player, dropShip, moveType){
+	    console.log('In game move');
+	    // Remove initial image
+	    displayShip(ships, dropObj.type);
+
+	    // draw image based on dropShip
+	    displayShip(ships, dropObj.type, dropShip);
+
+	    // Store ghostShip in move object
+	    player.setMove({type: moveType, coordinate: ev.target.id, ghost: dropShip, orientation: dropObj.orientation, shipType: dropObj.type});
+	}
+}
+
 /*
  * Build the grid and attach handlers for drag/drop events
  */
@@ -59,20 +89,21 @@ function _setMyListeners(cell, ships, fleet, player){
                     console.log('dropping');
                     let dropObj = JSON.parse(ev.dataTransfer.getData("text/plain"));
 		    console.log('current coord: ', dropObj.current_coord);
-                    let ship=ships.getShip(dropObj.type);
-
+		    let ship=ships.getShip(dropObj.type);
 		    let dropShip = fleet.ghostShip(dropObj.type, ev.target.id, dropObj.orientation, ship.size, dropObj.offset);
 
                     if(fleet.validateShip(dropShip, dropObj.type)) {
-			    // Remove initial image
-			    displayShip(ships, dropObj.type);
-
-			    fleet.setFleet (dropObj.orientation, dropObj.type, ship.size, ev.target.id, dropObj.offset); 
-
-			    // Redraw image in new location
-			    displayShip(ships, dropObj.type);
-
-		 	    player.setMove({type: 'move', coordinate: ev.target.id});
+			    /* There are different behaviors for setting ships based on the initial loading of the ships
+			     * versus moving a ship in game. When moving ships in game the display should change to reflect
+			     * the potential move but the internal structures should not change until it has been validated
+			     * when resolving moves.
+			     *
+			     * When setting up ships for the initial gam the structures should change along with the display,
+			     * all at once.
+			     *
+			     * The function moveShip is a closure whose value is changed once the player sets the initial fleet.
+			     */
+			    if(player.canMove()) {moveShip(ships, dropObj, ev, fleet, player, dropShip, 'move')};
                     }
 
                     ev.stopPropagation();
@@ -93,21 +124,17 @@ function _setMyListeners(cell, ships, fleet, player){
 
             cell.addEventListener('click', (
 		function(e){
+		    let drop = {};
 		    let type = _getTypeByClass(ships, this.className);
 		    let ship = ships.getShip(type);
 		    let orientation = (ship.orientation == 'x') ? 'y':'x'; // flip the orientation
                     let start = _find_start(e.target.id, orientation, ship.size, type);
 		    let ghost = fleet.ghostShip(type, e.target.id, orientation, ship.size, start.offset);
 
+		    drop.type = type;
+
                     if(fleet.validateShip(ghost, type)) {
-		        // Remove initial image
-		        displayShip(ships, type);
-    
-		        fleet.setFleet (orientation, type, ship.size, e.target.id); 
-    
-		        // Redraw image in new location
-		        displayShip(ships, type);
-		 	player.setMove({type: 'pivot', coordinate: e.target.id});
+			if(player.canMove()) {moveShip(ships, drop, e, fleet, player, ghost, 'pivot')};
                     }
                 }));
 }
@@ -155,8 +182,8 @@ function _find_start(start_pos, orientation, size, type){
     return {start_pos: start_pos, offset: offset};
 }
 
-let displayShip = function (ships, type) {
-    let coordinates = fleet.getFleet(type);
+let displayShip = function (ships, type, c) {
+    let coordinates = c || fleet.getFleet(type);
     let ship = ships.getShip(type);
 
     for (coord in coordinates) {
@@ -180,6 +207,7 @@ function _getTypeByClass(ships, className){
 
 module.exports={
     clickableGrid: clickableGrid,
-    displayShip: displayShip
+    displayShip: displayShip,
+    setMoveShip: setMoveShip
 }
 

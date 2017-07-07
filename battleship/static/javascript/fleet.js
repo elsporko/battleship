@@ -155,12 +155,13 @@ let validateShip = function (coordinates, type){
 
 	for (c in coordinates) {
 		let pieces = coordinates[c].split('_');
-		if (nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)] != type &&
-		    nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)] != undefined) {return false};
+			if (nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)] != type &&
+			    nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)] != undefined) {return false};
 	}
     }
     return true;
 };
+
 
 module.exports = {
     getFleet: getFleet,
@@ -169,5 +170,5 @@ module.exports = {
     validateShip: validateShip,
     checkGrid: checkGrid,
     buildNauticalChart: buildNauticalChart,
-    ghostShip: ghostShip
+    ghostShip: ghostShip,
 }

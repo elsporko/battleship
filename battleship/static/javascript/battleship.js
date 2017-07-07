@@ -3,7 +3,7 @@ var player = require('./player.js');
 var ships = require('./ships.js');
 var fleet = require('./fleet.js');
 var config = require('./config.js');
-let gameOn = false;
+var move = require('./move.js');
 
 
 player.gameFlow();
@@ -22,18 +22,19 @@ f.addEventListener('click',
     function(){
         document.getElementById('setFleet').style.display='none';
         document.getElementById('playerGrid').style.display='inline';
+	grid.setMoveShip(); // Change value of moveShip so that behavior is different after fleet has been set
 	    playGame();
 	    return;
     }, false);
 
-// Set up link to resolve orders
+// Set up link to resolve moves
 let d=document.getElementById('doMoves');
 d.addEventListener('click',
 	function(){
 		// Resolve orders
-		player.resolveOrders();
+		move.resolveMoves(fleet, ships, grid);
 		// Reset moves
-		player.playerClearMove();
+		move.clearMoveList();
 		// Turn moves over to the next player
 		// FIXME - Simulating moves for now. Remove when ready for realsies
 
@@ -90,8 +91,7 @@ while (1) {
 */
 
 function playGame(){
-	player.setGameOn();
-	if (player.myTurn()){
+	if (player.myTurn(fleet)){
 		//window.open('','attack', 'height=200,width=200,menubar=no,status=no,titlebar=no,toolbar=no', false );
 	}
 }

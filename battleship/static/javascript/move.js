@@ -12,18 +12,43 @@ let clearMoveList = function() {
 	moveList = [];
 }
 
-// Create a block to visually represent a move so it can be reordered if wanted
-let moveListBlock = function(handle, moveText) {
-	let b = document.createElement('div');
-	b.id = handle;
-	b.width = 100;
-	b.height = 21;
+/*
+ * Create a block to visually represent a move. Generic HTML block for move objects:
+ * <div id=<type>_<player>_<coords> class="move">
+ *   <div class="moveDetail">
+ *     attack: megan_0_0 (* Move text *)`
+ *     <div class="delete">delete</div> <!-- element to delete move before submitted -->
+ *   </div>
+ * </div>
+ * 
+ */
+let moveListBlock = function(move) {
+	let moveStruct={};
+	let mv = document.createElement('div');
+	moveStruct.id = mv.id = move.type + '_' + move.coordinate;
+	mv.className = 'move';
 
-	b.innerHTML=moveText;
+        mv.setAttribute('draggable','true');
+	moveOrderHandler(mv);
 
-        b.setAttribute('draggable','true');
-	moveOrderHandler(b);
-	return b;
+	let moveString = move.type + ': ' + move.coordinate;
+	let mdtl = document.createElement('div');
+	mdtl.innerHTML=moveString;
+
+	let mdel = document.createElement('div');
+	mdel.innerHTML='Delete';
+
+	mv.appendChild(mdtl);
+	mv.appendChild(mdel);
+	
+	moveStruct.dom = mv;
+	moveStruct.type = move.type;
+	moveStruct.ghost = move.ghost;
+	moveStruct.orientation = move.orientation;
+	moveStruct.shipType = move.shipType;
+	moveStruct.size = move.shipSize;
+
+	return moveStruct;
 }
 
 // Set up drag drop functionality for setting move order
@@ -70,8 +95,8 @@ function alterMoveIndex(startIndex, endIndex){
 	moveMap[startId] = end;
 }
 
-let resolveMoves = function (){
-	let parent = document.getElementById(gameDialog);
+let resolveMoves = function (fleet, ships, grid){
+	let parent = document.getElementById('playOrder');
 	console.log('Resolving moves');
 	for(m in moveList) {
 		let move = moveList[m];
@@ -84,29 +109,80 @@ let resolveMoves = function (){
 				setMine(move.coordinate);
 				break;
 			case 'move':
+				moveShip(fleet, ships, grid, move);
 				break;
 			case 'pivot':
 				break;
 		}
-	let child = document.getElementById(move.coordinate);
+	let child = document.getElementById(move.id);
 	parent.removeChild(child);
 	}
 }
 
+let moveShip = function(fleet, ships, grid, move){
+	// Check for mines based on ghost - send message to mine service
+	let blastAt = _check_for_mine(move.ghost);
+	if (blastAt != false){
+		// Reset ghost if mine found - If a mine has been encountered then the ship only moves to the point of the blast
+		_resetGhost(fleet, blastAt, move);
+		// TODO set ship as hit
+	}
+
+	let fl = fleet.getFleet(move.shipType);
+	let s = ships.getShip(move.shipType);
+
+	if (fl[0] == move.ghost[0] && move.orientation == s.orientation) { // check starting points and orientation set and redisplay only if different
+		// Validate move can be made
+		if(fleet.validateShip(move.ghost, move.shipType)) {
+			grid.displayShip(ships, move.shipType);
+			// Set ghost to NauticalChart/Map
+			fleet.setFleet (move.orientation, move.shipType, ships.getShip(move.shipType).size, move.ghost[0], 0); 
+		}
+
+		// Display new ship location based on NauticalChart/Map
+		grid.displayShip(ships, move.shipType, move.ghost);
+	}
+}
+
+function _resetGhost(fleet, blastAt, move){
+	for (i in move.ghost){
+		if (blastAt == move.ghost[i]) break;
+	}
+
+	return move.ghost = fleet.ghostShip(move.type, move.ghost[i], move.orientation, move.ghost.length, i);
+}
+
+// Stub for mine detection
+function _check_for_mine(g){
+	let mineAt = {'0_6': 1, '1_6': 1, '2_6': 1, '3_6': 1, '4_6': 1, '5_6': 1, '6_6': 1, '7_6': 1, '8_6': 1, '9_6': 1};
+	for(i in g) {
+		// return location where mine struck
+		if(mineAt[g[i]] == 1) { console.log('BOOM');
+			return g[i]; }
+	}
+	return false;
+}
+	
+
 let attackPlayer = function(coordinate){
+	// Send a message requesting hit/miss value on enemy's grid
+	// Inform all of enemy's coordinate status
 }
 
 let setMine = function(coordinate){
+	// Send a message requesting hit/miss value on enemy's grid
+	// If not a hit register with service that mine placed on enemy grid
 }
 
 let setMove = function(move){
-	let moveString;
+	//let moveString;
 	if(moveMap[move.coordinate] == undefined) {
 		moveMap[move.coordinate] = moveList.length;
-		moveString = move.type + ': ' + move.coordinate;
-		let b = moveListBlock(move.coordinate, moveString);
-		moveList.push(b);
-		document.getElementById('playOrder').appendChild(b);
+		//moveString = move.type + ': ' + move.coordinate;
+		//let b = moveListBlock(move.coordinate, moveString);
+		let mv = moveListBlock(move);
+		moveList.push(mv);
+		document.getElementById('playOrder').appendChild(mv.dom);
 	}
 }
 
@@ -120,5 +196,5 @@ module.exports = {
     deleteMove: deleteMove,
     moveOrderHandler: moveOrderHandler,
     resolveMoves: resolveMoves,
-    getMoveSize: getMoveSize
+    getMoveSize: getMoveSize,
 }
