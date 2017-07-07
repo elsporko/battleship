@@ -125,7 +125,17 @@ let moveShip = function(fleet, ships, grid, move){
 	if (blastAt != false){
 		// Reset ghost if mine found - If a mine has been encountered then the ship only moves to the point of the blast
 		_resetGhost(fleet, blastAt, move);
-		// TODO set ship as hit
+		// find which square got hit
+		let target;
+		for(m in move.ghost){
+			if (move.ghost[m] == blastAt)
+			{
+				target=move.ghost[m];
+				break;
+			}
+		}
+		ships.setHitCounter(move.shipType, m+1);
+		document.getElementById(target).className +=' shipHit';
 	}
 
 	let fl = fleet.getFleet(move.shipType);
@@ -157,8 +167,10 @@ function _check_for_mine(g){
 	let mineAt = {'0_6': 1, '1_6': 1, '2_6': 1, '3_6': 1, '4_6': 1, '5_6': 1, '6_6': 1, '7_6': 1, '8_6': 1, '9_6': 1};
 	for(i in g) {
 		// return location where mine struck
-		if(mineAt[g[i]] == 1) { console.log('BOOM');
-			return g[i]; }
+		if(mineAt[g[i]] == 1) { 
+			console.log('BOOM');
+			return g[i]; 
+		}
 	}
 	return false;
 }

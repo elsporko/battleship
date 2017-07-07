@@ -113,3 +113,6 @@ div.instructions{
   margin: auto;
   padding: 5px;
 }
+.shipHit{
+  color: Red;
+}

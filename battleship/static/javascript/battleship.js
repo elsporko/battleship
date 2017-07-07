@@ -22,7 +22,7 @@ f.addEventListener('click',
     function(){
         document.getElementById('setFleet').style.display='none';
         document.getElementById('playerGrid').style.display='inline';
-	grid.setMoveShip(); // Change value of moveShip so that behavior is different after fleet has been set
+	grid.setMoveShip(); 
 	    playGame();
 	    return;
     }, false);

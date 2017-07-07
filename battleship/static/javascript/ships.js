@@ -8,6 +8,7 @@ let ship_config = {
         color : 'Crimson',
         clickClass : 'acclicked',
         label : 'Aircraft Carrier',
+	mask : 31,
     },
     battleship : {
         size : 4,
@@ -15,6 +16,7 @@ let ship_config = {
         color:'DarkGreen',
         clickClass : 'bsclicked',
         label : 'Battleship',
+	mask: 15,
     },
     destroyer : {
         size : 3,
@@ -22,6 +24,7 @@ let ship_config = {
         color:'CadetBlue',
         clickClass : 'declicked',
         label : 'Destroyer',
+	mask: 7,
     },
     submarine  : {
         size : 3,
@@ -29,6 +32,7 @@ let ship_config = {
         color:'DarkRed',
         clickClass : 'suclicked',
         label : 'Submarine',
+	mask : 7,
     },
     patrolBoat : {
         size : 2,
@@ -36,8 +40,45 @@ let ship_config = {
         color:'Gold',
         clickClass : 'pbclicked',
         label : 'Patrol Boat',
+	mask: 3,
     },
 };
+
+let hitCounter = {
+    aircraftCarrier : 0,
+    battleship : 0,
+    destroyer : 0,
+    submarine  : 0,
+    patrolBoat : 0
+};
+
+let sunkCounter; // Tracks which boats have been sunk
+
+// Values for determining bit values when a boat sinks
+const airCraftCarrier = 1;
+const battleship = 2;
+const destroyer = 4;
+const submarine = 8;
+const patrolBoat = 16;
+
+let setHitCounter = function (type, bit) {
+	hitCounter[type] = ship_config[type].mask^(bit*bit);
+	if (hitCounter[type] == ship_config[type].mask) { // I don't know if this is correct but the idea is check to see if the ship is sunk and flag it if need be
+		setSunkCounter(type);
+	}
+}
+
+let setSunkCounter = function (type) {
+	sunkCounter = sunkCounter^type;
+}
+
+let getHitCounter = function (type){
+	return hitCounter[type];
+}
+
+let getSunkCounter = function(){
+	return sunkCounter;
+}
 
 // Ship constructor - shipyard???
 function _ship(size, id, color, clickClass, label) {
@@ -171,5 +212,6 @@ module.exports = {
     buildShip: buildShip,
     getShip: getShip,
     setShip: setShip,
-    placeShips: placeShips
+    placeShips: placeShips,
+    setHitCounter: setHitCounter
 }
