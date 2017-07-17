@@ -21,7 +21,7 @@ let getFleet = function(type){
 	let pieces = nauticalMap[type].start_coord.split('_');
 	let ret = new Array;
 
-	while (nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)] == type) {
+	while (pieces[orientation] < nauticalChart[orientation].length && nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)] == type) {
 		ret.push (pieces[0] + '_' + pieces[1]);
 		pieces[orientation] = parseInt(pieces[orientation], 10) + 1;
 	}

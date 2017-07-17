@@ -27,7 +27,7 @@ let setMoveShip = function(){
 	    displayShip(ships, dropObj.type, dropShip);
 
 	    // Store ghostShip in move object
-	    player.setMove({type: moveType, coordinate: ev.target.id, ghost: dropShip, orientation: dropObj.orientation, shipType: dropObj.type});
+	    player.setMove({type: moveType, coordinate: ev.target.id, ghost: dropShip, orientation: dropObj.orientation, shipType: dropObj.type, ships: ships, grid: this});
 	}
 }
 
@@ -127,14 +127,19 @@ function _setMyListeners(cell, ships, fleet, player){
 		    let drop = {};
 		    let type = _getTypeByClass(ships, this.className);
 		    let ship = ships.getShip(type);
+                    let start = _find_start(e.target.id, ship.orientation, ship.size, type);
 		    let orientation = (ship.orientation == 'x') ? 'y':'x'; // flip the orientation
-                    let start = _find_start(e.target.id, orientation, ship.size, type);
+		    //let ghost = fleet.ghostShip(type, e.target.id, orientation, ship.size, start.offset);
 		    let ghost = fleet.ghostShip(type, e.target.id, orientation, ship.size, start.offset);
 
 		    drop.type = type;
+		    drop.offset = start.offset;
+		    drop.orientation = orientation;
 
                     if(fleet.validateShip(ghost, type)) {
-			if(player.canMove()) {moveShip(ships, drop, e, fleet, player, ghost, 'pivot')};
+			if(player.canMove()) {
+		            ship.orientation = orientation;
+			    moveShip(ships, drop, e, fleet, player, ghost, 'pivot')};
                     }
                 }));
 }
@@ -171,7 +176,8 @@ function _find_start(start_pos, orientation, size, type){
 	if (pieces[index] == 0) {break;}
         pieces[index]--;
 	let g = fleet.checkGrid(pieces[0] + '_' + pieces[1]);
-        if (g != undefined && g == type && g != false){
+        //if (g != undefined && g == type && g != false){
+        if (g == type && g != false){
 	    offset++;
             start_pos = pieces[0] + '_' + pieces[1];
         } else {

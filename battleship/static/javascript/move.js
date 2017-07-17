@@ -28,6 +28,8 @@ let moveListBlock = function(move) {
 	moveStruct.id = mv.id = move.type + '_' + move.coordinate;
 	mv.className = 'move';
 
+	move.undo = fleet.ghostShip(move.shipType);
+
         mv.setAttribute('draggable','true');
 	moveOrderHandler(mv);
 
@@ -37,18 +39,49 @@ let moveListBlock = function(move) {
 
 	let mdel = document.createElement('div');
 	mdel.innerHTML='Delete';
+	mdel.id = 'del_' + mv.id;
+	_set_mvListeners(mv, move);
+
 
 	mv.appendChild(mdtl);
 	mv.appendChild(mdel);
 	
 	moveStruct.dom = mv;
 	moveStruct.type = move.type;
+	// store current ship coordinate string so that when a move is deleted it will be restored to it's prior location
 	moveStruct.ghost = move.ghost;
 	moveStruct.orientation = move.orientation;
 	moveStruct.shipType = move.shipType;
 	moveStruct.size = move.shipSize;
 
 	return moveStruct;
+}
+
+// Add delete move function
+function _set_mvListeners(mv, move){
+	mv.addEventListener('click', (function() {
+		// Check to see if another ship is in the path of the attempted restore
+		if (fleet.validateShip(move.undo, move.shipType, move.grid, move.ships)) {
+			// Remove the div
+			// Need to know parent element which, for everything in the move list, is the element whose id is playOrder
+			let p = document.getElementById('playOrder');
+			let dmv = document.getElementById(mv.id);
+			p.removeChild(dmv);
+
+			// Delete the entry from the array
+			//moveList.push(mv);
+			for (l in moveList) {
+				if(moveList[l].id == mv.id){
+					moveList.splice(l,1);
+					break;
+				}
+			}
+
+			// Repaint the original ship
+			move.grid.displayShip(move.ships, move.shipType);
+			move.grid.displayShip(move.ships, move.shipType, move.undo);
+		}
+	}));
 }
 
 // Set up drag drop functionality for setting move order
