@@ -1,10 +1,10 @@
-var grid = require('./grid.js');
-var player = require('./player.js');
-var ships = require('./ships.js');
-var fleet = require('./fleet.js');
-var config = require('./config.js');
-var move = require('./move.js');
-
+'use strict';
+var grid = require('./grid');
+var fleet = require('./fleet');
+var ships = require('./ships');
+var player = require('./player');
+//var config = require('./config.js');
+var move = require('./move');
 
 player.gameFlow();
 
@@ -14,7 +14,7 @@ let r=document.getElementById('register');
 r.addEventListener('click', 
     function(){
 	    player.register();
-	    return;
+	    //return;
     }, false);
 
 let f=document.getElementById('setFleet');
@@ -24,7 +24,7 @@ f.addEventListener('click',
         document.getElementById('playerGrid').style.display='inline';
 	grid.setMoveShip(); 
 	    playGame();
-	    return;
+	    //return;
     }, false);
 
 // Set up link to resolve moves
@@ -32,7 +32,7 @@ let d=document.getElementById('doMoves');
 d.addEventListener('click',
 	function(){
 		// Resolve orders
-		move.resolveMoves(fleet, ships, grid);
+		move.resolveMoves();
 		// Reset moves
 		move.clearMoveList();
 		// Turn moves over to the next player
@@ -48,11 +48,19 @@ document.getElementById('myGrid').appendChild(grid.clickableGrid(10, 10, ships, 
 
 /* Set random fleet */
 ships.buildShips();
-ships.placeShips(fleet);
-let wholeFleet = fleet.getWholeFleet(fleet);
-for (t in wholeFleet) {
+ships.placeShips();
+let wholeFleet = fleet.getWholeFleet();
+for (let t in wholeFleet) {
 	grid.displayShip(ships, t);
 }
+/*
+ships.buildShips();
+ships.placeShips(fleet);
+let wholeFleet = fleet.getWholeFleet(fleet);
+for (let t in wholeFleet) {
+	grid.displayShip(ships, t);
+}
+*/
 
 /* 
  * Mock game will be removed 
@@ -60,7 +68,7 @@ for (t in wholeFleet) {
 let m = document.getElementById('MeganReg');
 m.addEventListener('click', 
     function(){
-        player.acceptReg('Megan', 1, grid, ships, fleet, player);
+        player.acceptReg('Megan', 1);
         //m.style.display='none';
         document.getElementById('MeganReg').style.display='none';
 	//document.getElementById(flow[currentFlow]).style.display='none';
