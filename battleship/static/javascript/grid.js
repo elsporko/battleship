@@ -1,5 +1,7 @@
-let fleet = require('./fleet');
-let ships = require('./ships');
+'use strict';
+var fleet = require('./fleet.js');
+var ships = require('./ships.js');
+var player = require('./player.js');
 
 let moveShip = function(ships, dropObj, ev, fleet, player){
     console.log('pre-set fleet move');
@@ -27,7 +29,15 @@ let setMoveShip = function(){
 	    displayShip(ships, dropObj.type, dropShip);
 
 	    // Store ghostShip in move object
-	    player.setMove({type: moveType, coordinate: ev.target.id, ghost: dropShip, orientation: dropObj.orientation, shipType: dropObj.type, ships: ships, grid: this});
+	    player.setMove({ type: moveType, 
+		             coordinate: ev.target.id, 
+		             ghost: dropShip,
+		             orientation: dropObj.orientation, 
+		             shipType: dropObj.type,
+		             ships: ships, 
+		             grid: grid, 
+		             undo: fleet.ghostShip(dropObj.type) // Need to preserve the ship's position pre-move
+	    });
 	}
 }
 
@@ -35,10 +45,10 @@ let setMoveShip = function(){
  * Build the grid and attach handlers for drag/drop events
  */
 let clickableGrid = function ( rows, cols, ships, fleet, player, phandle){
-    let grid = document.createElement('table');
-    grid.className='grid';
+    let gridTable = document.createElement('table');
+    gridTable.className='grid';
     for (var r=0;r<rows;++r){
-        var tr = grid.appendChild(document.createElement('tr'));
+        var tr = gridTable.appendChild(document.createElement('tr'));
         for (var c=0;c<cols;++c){
             var cell = tr.appendChild(document.createElement('td'));
             // Each cell on the grid is of class 'cell'
@@ -54,7 +64,7 @@ let clickableGrid = function ( rows, cols, ships, fleet, player, phandle){
 	    }
         }
     }
-    return grid;
+    return gridTable;
 }
 
 function _setMyListeners(cell, ships, fleet, player){
@@ -172,7 +182,7 @@ function _find_start(start_pos, orientation, size, type){
     let pieces=start_pos.split('_');
     let offset = 0;
 
-    for (i=0; i < size; i++) {
+    for (let i=0; i < size; i++) {
 	if (pieces[index] == 0) {break;}
         pieces[index]--;
 	let g = fleet.checkGrid(pieces[0] + '_' + pieces[1]);
@@ -192,7 +202,7 @@ let displayShip = function (ships, type, c) {
     let coordinates = c || fleet.getFleet(type);
     let ship = ships.getShip(type);
 
-    for (coord in coordinates) {
+    for (let coord in coordinates) {
         _setSpace(coordinates[coord], ship.clickClass);
     }
 }
@@ -204,16 +214,16 @@ function _setSpace(space, className) {
 
 function _getTypeByClass(ships, className){
 	let shipList = ships.getShip();
-	for (s in shipList){
+	for (let s in shipList){
 		if (className.match(shipList[s].clickClass)){
 			return shipList[s].type;
 		}
 	}
 }
 
-module.exports={
+module.exports = {
     clickableGrid: clickableGrid,
     displayShip: displayShip,
-    setMoveShip: setMoveShip
+    setMoveShip: setMoveShip,
 }
 

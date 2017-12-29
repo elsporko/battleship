@@ -1,3 +1,5 @@
+'use strict';
+var fleet = (function () {
 var ships=require('./ships.js');
 
 let nauticalMap = {}; // Hash lookup that tracks each ship's starting point and current orientation
@@ -31,7 +33,7 @@ let getFleet = function(type){
 
 let getWholeFleet = function(){
 	let ret={};
-	for (t in nauticalMap) {
+	for (let t in nauticalMap) {
 		ret[t] = getFleet(t);
 	}
 	return ret;
@@ -41,8 +43,7 @@ let getWholeFleet = function(){
 /*
  * setFleet - place ship on nautical chart
  */
-let setFleet = function (orientation, type, size, start_coord, offset){
-    let pieces = start_coord.split('_');
+let setFleet = function (orientation, type, size, start_coord, offset){ let pieces = start_coord.split('_');
     let index = (orientation == 'x') ? 0 : 1;
 
     offset = offset || 0;
@@ -74,7 +75,7 @@ function _clearShip(type, size){
     let pieces = map.start_coord.split('_');
     let index = (map.orientation == 'x') ? 0 : 1;
 
-    for (i=0; i < size; i++) {
+    for (let i=0; i < size; i++) {
 	    nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)]=undefined;
 	    pieces[index]++;
     }
@@ -118,7 +119,7 @@ let readMap = function(type){
 let checkGrid = function(coordinates){
 	if (coordinates instanceof Array){
 		let ret = new Array;
-		for(c in coordinates){
+		for(let c in coordinates){
 			let s = _setChart(coordinates[c]);
 			if (s === false) {return false};
 			ret.push (s);
@@ -149,11 +150,11 @@ let validateShip = function (coordinates, type){
     for (var p=0; p < coordinates.length; p++) {
 
 	// Is there a collision?
-	let grid = checkGrid(coordinates);
+	let collision = checkGrid(coordinates);
 	
-	if (grid == false) {return false}; // If checkGrid returns false coordinates are out of range
+	if (collision == false) {return false}; // If checkGrid returns false coordinates are out of range
 
-	for (c in coordinates) {
+	for (let c in coordinates) {
 		let pieces = coordinates[c].split('_');
 			if (nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)] != type &&
 			    nauticalChart[parseInt(pieces[0], 10)][parseInt(pieces[1], 10)] != undefined) {return false};
@@ -171,4 +172,4 @@ module.exports = {
     checkGrid: checkGrid,
     buildNauticalChart: buildNauticalChart,
     ghostShip: ghostShip,
-}
+})();

@@ -1,3 +1,4 @@
+'use strict';
 var fleet=require('./fleet.js');
 
 // Config settings 
@@ -177,7 +178,7 @@ let _shipString = function(s) {
 /*
  * placeShips - Initial placement of ships on the board
  */
-let placeShips = function placeShips(fleet){
+let placeShips = function placeShips(){
         /* Randomly place ships on the grid. In order do this each ship must:
 	 *   * Pick an orientation
 	 *   * Pick a starting coordinate

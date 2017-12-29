@@ -1,6 +1,9 @@
+'use strict';
 // Module to manage moves on player's turn.
 
-let fleet = require('./fleet.js');
+var fleet = require('./fleet.js');
+var grid = require('./grid.js');
+var ships = require('./ships.js');
 
 let moveList = [];
 let moveMap = {};
@@ -28,8 +31,6 @@ let moveListBlock = function(move) {
 	moveStruct.id = mv.id = move.type + '_' + move.coordinate;
 	mv.className = 'move';
 
-	move.undo = fleet.ghostShip(move.shipType);
-
         mv.setAttribute('draggable','true');
 	moveOrderHandler(mv);
 
@@ -41,7 +42,6 @@ let moveListBlock = function(move) {
 	mdel.innerHTML='Delete';
 	mdel.id = 'del_' + mv.id;
 	_set_mvListeners(mv, move);
-
 
 	mv.appendChild(mdtl);
 	mv.appendChild(mdel);
@@ -61,7 +61,7 @@ let moveListBlock = function(move) {
 function _set_mvListeners(mv, move){
 	mv.addEventListener('click', (function() {
 		// Check to see if another ship is in the path of the attempted restore
-		if (fleet.validateShip(move.undo, move.shipType, move.grid, move.ships)) {
+		if (fleet.validateShip(move.undo, move.shipType, grid, ships)) {
 			// Remove the div
 			// Need to know parent element which, for everything in the move list, is the element whose id is playOrder
 			let p = document.getElementById('playOrder');
@@ -70,7 +70,7 @@ function _set_mvListeners(mv, move){
 
 			// Delete the entry from the array
 			//moveList.push(mv);
-			for (l in moveList) {
+			for (let l in moveList) {
 				if(moveList[l].id == mv.id){
 					moveList.splice(l,1);
 					break;
@@ -78,8 +78,9 @@ function _set_mvListeners(mv, move){
 			}
 
 			// Repaint the original ship
-			move.grid.displayShip(move.ships, move.shipType);
-			move.grid.displayShip(move.ships, move.shipType, move.undo);
+			grid.displayShip(ships, move.shipType);
+			fleet.setFleet (move.orientation, move.shipType, ships.getShip(move.shipType).size, move.ghost[0], 0); 
+			grid.displayShip(move.ships, move.shipType);
 		}
 	}));
 }
@@ -131,7 +132,7 @@ function alterMoveIndex(startIndex, endIndex){
 let resolveMoves = function (fleet, ships, grid){
 	let parent = document.getElementById('playOrder');
 	console.log('Resolving moves');
-	for(m in moveList) {
+	for(let m in moveList) {
 		let move = moveList[m];
 		console.log('move: ', move);
 		switch(move.type) {
@@ -142,7 +143,8 @@ let resolveMoves = function (fleet, ships, grid){
 				setMine(move.coordinate);
 				break;
 			case 'move':
-				moveShip(fleet, ships, grid, move);
+				//moveShip(fleet, ships, grid, move);
+				moveShip(move);
 				break;
 			case 'pivot':
 				break;
@@ -152,15 +154,16 @@ let resolveMoves = function (fleet, ships, grid){
 	}
 }
 
-let moveShip = function(fleet, ships, grid, move){
+//let moveShip = function(fleet, ships, grid, move){
+let moveShip = function(move){
 	// Check for mines based on ghost - send message to mine service
 	let blastAt = _check_for_mine(move.ghost);
 	if (blastAt != false){
 		// Reset ghost if mine found - If a mine has been encountered then the ship only moves to the point of the blast
-		_resetGhost(fleet, blastAt, move);
+		_resetGhost(blastAt, move);
 		// find which square got hit
 		let target;
-		for(m in move.ghost){
+		for(let m in move.ghost){
 			if (move.ghost[m] == blastAt)
 			{
 				target=move.ghost[m];
@@ -187,8 +190,8 @@ let moveShip = function(fleet, ships, grid, move){
 	}
 }
 
-function _resetGhost(fleet, blastAt, move){
-	for (i in move.ghost){
+function _resetGhost(blastAt, move){
+	for (let i in move.ghost){
 		if (blastAt == move.ghost[i]) break;
 	}
 
@@ -198,7 +201,7 @@ function _resetGhost(fleet, blastAt, move){
 // Stub for mine detection
 function _check_for_mine(g){
 	let mineAt = {'0_6': 1, '1_6': 1, '2_6': 1, '3_6': 1, '4_6': 1, '5_6': 1, '6_6': 1, '7_6': 1, '8_6': 1, '9_6': 1};
-	for(i in g) {
+	for(let i in g) {
 		// return location where mine struck
 		if(mineAt[g[i]] == 1) { 
 			console.log('BOOM');

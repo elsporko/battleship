@@ -282,7 +282,7 @@ let grid = {
 				     *
 				     * The function moveShip is a closure whose value is changed once the player sets the initial fleet.
 				     */
-				    if(player.canMove()) {grid.moveShip(ships, dropObj, ev, dropShip, 'move')};
+				    if(player.canMove()) {grid.moveShip(dropObj, ev, dropShip, 'move')};
 			    }
 
 			    ev.stopPropagation();
@@ -331,8 +331,8 @@ let grid = {
 		    cell.addEventListener('click', (
 			function(e){
 			    if(player.canMove()) {
-				player.setMove({type: 'attack',
-						      coordinate: e.target.id});
+				move.setMove({type: 'attack',
+					      coordinate: e.target.id});
 				console.log( e.target.id + ' is under attack');
 			    }
 			}
@@ -385,7 +385,8 @@ let grid = {
 		let shipList = ships.getShip();
 		for (let s in shipList){
 			if (className.match(shipList[s].clickClass)){
-				return shipList[s].type;
+				return s;
+				//return shipList[s].type;
 			}
 		}
 	}
@@ -695,40 +696,40 @@ let move = {
 	 * </div>
 	 * 
 	 */
-	moveListBlock: function(move) {
+	moveListBlock: function(m) {
 		let moveStruct={};
 		let mv = document.createElement('div');
-		moveStruct.id = mv.id = move.type + '_' + move.coordinate;
+		moveStruct.id = mv.id = m.type + '_' + m.coordinate;
 		mv.className = 'move';
 
 		mv.setAttribute('draggable','true');
 		move.moveOrderHandler(mv);
 
-		let moveString = move.type + ': ' + move.coordinate;
+		let moveString = m.type + ': ' + m.coordinate;
 		let mdtl = document.createElement('div');
 		mdtl.innerHTML=moveString;
 
 		let mdel = document.createElement('div');
 		mdel.innerHTML='Delete';
 		mdel.id = 'del_' + mv.id;
-		move._set_mvListeners(mv, move);
+		move._set_mvListeners(mv);
 
 		mv.appendChild(mdtl);
 		mv.appendChild(mdel);
 		
 		moveStruct.dom = mv;
-		moveStruct.type = move.type;
+		moveStruct.type = m.type;
 		// store current ship coordinate string so that when a move is deleted it will be restored to it's prior location
-		moveStruct.ghost = move.ghost;
-		moveStruct.orientation = move.orientation;
-		moveStruct.shipType = move.shipType;
-		moveStruct.size = move.shipSize;
+		moveStruct.ghost = m.ghost;
+		moveStruct.orientation = m.orientation;
+		moveStruct.shipType = m.shipType;
+		moveStruct.size = m.shipSize;
 
 		return moveStruct;
 	},
 
 	// Add delete move function
-	_set_mvListeners: function(mv, move){
+	_set_mvListeners: function(mv){
 		mv.addEventListener('click', (function() {
 			// Check to see if another ship is in the path of the attempted restore
 			if (fleet.validateShip(move.undo, move.shipType)) {
@@ -892,13 +893,13 @@ let move = {
 		// If not a hit register with service that mine placed on enemy grid
 	},
 
-	setMove: function(move){
+	setMove: function(m){
 		//let moveString;
-		if(move.moveMap[move.coordinate] == undefined) {
-			move.moveMap[move.coordinate] = move.moveList.length;
+		if(move.moveMap[m.coordinate] == undefined) {
+			move.moveMap[m.coordinate] = move.moveList.length;
 			//moveString = move.type + ': ' + move.coordinate;
 			//let b = move.moveListBlock(move.coordinate, moveString);
-			let mv = move.moveListBlock();
+			let mv = move.moveListBlock(m);
 			move.moveList.push(mv);
 			document.getElementById('playOrder').appendChild(mv.dom);
 		}
@@ -993,7 +994,7 @@ ry.addEventListener('click',
 let tr = document.getElementById('TraceyReg');
 tr.addEventListener('click', 
     function(){
-        player.acceptReg('Tracey', 2);
+        player.acceptReg('Tracey', 3);
         document.getElementById('TraceyReg').style.display='none';
     }, false);
 
