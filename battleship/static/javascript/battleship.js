@@ -3,6 +3,9 @@
 /*** fleet.js ***/
 var fleet = {
 	nauticalMap: {}, // Hash lookup that tracks each ship's starting point and current orientation
+	init: function(){
+		return fleet.nauticalChart = fleet.buildNauticalChart(); // Detailed matrix of every ship in the fleet
+	},
 
 	buildNauticalChart: function(){
 		let chart = new Array;
@@ -15,19 +18,8 @@ var fleet = {
 		return chart;
 	},
 
-	/*
-	nauticalChart: function(){
-		return fleet.buildNauticalChart(); // Detailed matrix of every ship in the fleet
-	},
-	*/
-
-	init: function(){
-		return fleet.nauticalChart = fleet.buildNauticalChart(); // Detailed matrix of every ship in the fleet
-	},
-
 	getFleet: function(type){
 		let orientation = fleet.nauticalMap[type].orientation == 'x' ? 0 : 1;
-
 		let pieces = fleet.nauticalMap[type].start_coord.split('_');
 		let ret = new Array;
 
@@ -63,7 +55,7 @@ var fleet = {
 	    /*
 	     * Remove old ship from nauticalChart/Map
 	     */
-	    fleet._clearShip(type, size);
+	    fleet.clearShip(type, size);
 
 	    // set the nautical map value for this boat
 	    fleet.nauticalMap[type]={
@@ -77,7 +69,7 @@ var fleet = {
 	    }
 	},
 
-	_clearShip: function(type, size){
+	clearShip: function(type, size){
 	    let map = fleet.nauticalMap[type];
 	    if (map === undefined){return false;}
 
@@ -128,17 +120,17 @@ var fleet = {
 		if (coordinates instanceof Array){
 			let ret = new Array;
 			for(let c in coordinates){
-				let s = fleet._setChart(coordinates[c]);
+				let s = fleet.setChart(coordinates[c]);
 				if (s === false) {return false};
 				ret.push (s);
 			}
 			return ret;
 		} else {
-			return fleet._setChart(coordinates);
+			return fleet.setChart(coordinates);
 		}
 	},
 
-	_setChart: function(coordinate){
+	setChart: function(coordinate){
 		let pieces = coordinate.split('_');
 		if (parseInt(pieces[0], 10) >= fleet.nauticalChart.length ||
 		    parseInt(pieces[1], 10)>= fleet.nauticalChart[parseInt(pieces[0], 10)].length) {
@@ -174,7 +166,6 @@ var fleet = {
 
 /*** grid.js ***/
 let grid = {
-
 	moveShip: function(dropObj, ev){
 	    console.log('pre-set fleet move');
 	    let ship=ships.getShip(dropObj.type);
@@ -228,27 +219,27 @@ let grid = {
 		    cell.id = r + '_' + c;
 
 		    if (phandle == undefined){
-			grid._setMyListeners(cell)
+			grid.setMyListeners(cell)
 		    } else {
-		       grid._setPlayerListeners(cell, phandle);
+		       grid.setPlayerListeners(cell, phandle);
 		    }
 		}
 	    }
 	    return gridTable;
 	},
 
-	_setMyListeners: function(cell){
+	setMyListeners: function(cell){
 		    // Set up drag and drop for each cell.
 		    cell.setAttribute('draggable','true');
 
 		    cell.addEventListener('dragstart',(
 			function(ev){
 			    ev.dataTransfer.effectAllowed='move';
-			    let type = grid._getTypeByClass(this.className);
+			    let type = grid.getTypeByClass(this.className);
 			    let ship = ships.getShip(type);
 
 			    // Calculate which square was clicked to guide placement
-			    let start = grid._find_start(this.id, ship.orientation, ship.size, type);
+			    let start = grid.find_start(this.id, ship.orientation, ship.size, type);
 			    ev.dataTransfer.setData("text/plain", 
 				JSON.stringify({
 						offset:        start.offset,
@@ -304,11 +295,10 @@ let grid = {
 		    cell.addEventListener('click', (
 			function(e){
 			    let drop = {};
-			    let type = grid._getTypeByClass(this.className);
+			    let type = grid.getTypeByClass(this.className);
 			    let ship = ships.getShip(type);
-			    let start = grid._find_start(e.target.id, ship.orientation, ship.size, type);
+			    let start = grid.find_start(e.target.id, ship.orientation, ship.size, type);
 			    let orientation = (ship.orientation == 'x') ? 'y':'x'; // flip the orientation
-			    //let ghost = fleet.ghostShip(type, e.target.id, orientation, ship.size, start.offset);
 			    let ghost = fleet.ghostShip(type, e.target.id, orientation, ship.size, start.offset);
 
 			    drop.type = type;
@@ -323,7 +313,7 @@ let grid = {
 			}));
 	},
 
-	_setPlayerListeners: function(cell, handle){
+	setPlayerListeners: function(cell, handle){
 		    // Set the ID value of each cell to the row/column value formatted as r_c
 		    cell.id = handle + '_' + cell.id;
 		    // Set up drag and drop for each cell.
@@ -331,7 +321,7 @@ let grid = {
 		    cell.addEventListener('click', (
 			function(e){
 			    if(player.canMove()) {
-				move.setMove({type: 'attack',
+				player.setMove({type: 'attack',
 					      coordinate: e.target.id});
 				console.log( e.target.id + ' is under attack');
 			    }
@@ -340,12 +330,12 @@ let grid = {
 	},
 
 	/*
-	 * _find_start - Determine the starting coordinate of a ship given the square that was clicked. For example
+	 * find_start - Determine the starting coordinate of a ship given the square that was clicked. For example
 	 * it is possible that a battleship along the x-axis was clicked at location 3_3 but that was the second square
 	 * on the ship. This function will identify that the battleship starts at 2_3.
 	 */
 
-	_find_start: function(start_pos, orientation, size, type){
+	find_start: function(start_pos, orientation, size, type){
 	    let index = (orientation == 'x') ? 0 : 1;
 
 	    let pieces=start_pos.split('_');
@@ -355,7 +345,6 @@ let grid = {
 		if (pieces[index] == 0) {break;}
 		pieces[index]--;
 		let g = fleet.checkGrid(pieces[0] + '_' + pieces[1]);
-		//if (g != undefined && g == type && g != false){}
 		if (g == type && g != false){
 		    offset++;
 		    start_pos = pieces[0] + '_' + pieces[1];
@@ -372,16 +361,16 @@ let grid = {
 	    let ship = ships.getShip(type);
 
 	    for (let coord in coordinates) {
-		grid._setSpace(coordinates[coord], ship.clickClass);
+		grid.setSpace(coordinates[coord], ship.clickClass);
 	    }
 	},
 
-	_setSpace: function(space, className) {
+	setSpace: function(space, className) {
 	    var b = document.getElementById(space); 
 	    b.classList.toggle(className);
 	},
 
-	_getTypeByClass: function(className){
+	getTypeByClass: function(className){
 		let shipList = ships.getShip();
 		for (let s in shipList){
 			if (className.match(shipList[s].clickClass)){
@@ -391,6 +380,7 @@ let grid = {
 		}
 	}
 };
+
 /*** ships.js ***/
 let ships = {
 	// Config settings 
@@ -474,7 +464,7 @@ let ships = {
 	},
 
 	// Ship constructor - shipyard???
-	_ship: function(size, id, color, clickClass, label) {
+	ship: function(size, id, color, clickClass, label) {
 		this.size        = size;
 		this.id          = id;
 		this.color       = color;
@@ -484,20 +474,12 @@ let ships = {
 		return (this);
 	},
 
-	//ships: {},
-
 	/*
 	 * The ship object holds the current orientation of the ship and the start coordinate (topmost/leftmost). When
 	 * there is a change to the ship the master matrix needs to be updated. An event will be triggered when there is
 	 * a coordinate change. This listener will update the master matrix. Calls to check location (move validtion, 
 	 * check if hit, etc.) will be made against the master matrix.
 	 */
-	/*
-	let shipIint = function(){
-	    addEventListener('shipMove',()) }
-
-	{}
-	*/
 	// Public function to initially create ships object
 	buildShips: function (){
 	    for (let s in ships.ship_config){
@@ -512,7 +494,7 @@ let ships = {
 	},
 
 	buildShip: function(type){
-		ships[type] = ships._ship(ships.ship_config[type].size, ships.ship_config[type].id, ships.ship_config[type].color, ships.ship_config[type].clickClass, ships.ship_config[type].label);
+		ships[type] = ships.ship(ships.ship_config[type].size, ships.ship_config[type].id, ships.ship_config[type].color, ships.ship_config[type].clickClass, ships.ship_config[type].label);
 		return ships;
 	},
 
@@ -533,10 +515,10 @@ let ships = {
 	},
 
 	// Private function to randomly determine ship's orientation along the X-axis or Y-axis. Only used when plotting ships for the first time.
-	_getStartCoordinate: function(size){
+	getStartCoordinate: function(size){
 	    const start_orientation=Math.floor(Math.random()*10) > 5 ? 'x' : 'y';
-	    const start_x = start_orientation == 'x' ? ships._getRandomCoordinate(size) : ships._getRandomCoordinate(0);
-	    const start_y = start_orientation == 'y' ? ships._getRandomCoordinate(size) : ships._getRandomCoordinate(0);
+	    const start_x = start_orientation == 'x' ? ships.getRandomCoordinate(size) : ships.getRandomCoordinate(0);
+	    const start_y = start_orientation == 'y' ? ships.getRandomCoordinate(size) : ships.getRandomCoordinate(0);
 
 	    return {coordinate: start_x + '_' + start_y, orientation: start_orientation};
 	},
@@ -544,13 +526,14 @@ let ships = {
 	// Take ship size and orientation into account when determining the start range value. ex. don't
 	// let an aircraft carrier with an orientation of 'X' start at row 7 because it will max out over the
 	// grid size.
-	_getRandomCoordinate: function(offset){
+	getRandomCoordinate: function(offset){
 	    const MAX_COORD = 10;
 	    return Math.floor(Math.random()*(MAX_COORD - offset));
 	},
 
 	// FIXME Does fleet.ghostShip do this now?
 	// Build an array of coordinates for a ship based on it's orientation, intended start point and size
+	/*
 	_shipString: function(s) {
 		const o = s.orientation;
 		const st = s.start_coordinate;
@@ -564,6 +547,7 @@ let ships = {
 		}
 		return r;
 	},
+	*/
 
 	/*
 	 * placeShips - Initial placement of ships on the board
@@ -580,20 +564,17 @@ let ships = {
 		let shipList = ships.getShip();
 		for (var ship in shipList) {
 		    
-		    let start = ships._getStartCoordinate(shipList[ship].size); 
-		    //let ship_string = fleet.ghostShip(shipList[ship].type, start.coordinate, start.orientation);
+		    let start = ships.getStartCoordinate(shipList[ship].size); 
 		    let ship_string = fleet.ghostShip(ship, start.coordinate, start.orientation);
 		    shipList[ship].orientation = start.orientation;
 
 		    while (!fleet.validateShip(ship_string)) {
-			start = ships._getStartCoordinate(shipList[ship].size); 
+			start = ships.getStartCoordinate(shipList[ship].size); 
 			shipList[ship].orientation = start.orientation;
-			//ship_string = fleet.ghostShip(shipList[ship].type, start.coordinate, start.orientation);
 			ship_string = fleet.ghostShip(ship, start.coordinate, start.orientation);
 			}
 
 		    fleet.setFleet(start.orientation,
-			       //shipList[ship].type,
 			       ship,
 			       shipList[ship].size,
 			       start.coordinate);
@@ -625,7 +606,6 @@ let player = {
 			      order: 0
 		};
 
-		//_populate_playerOrder('elsporko', 0);
 		player.playerOrder[reg.order] = reg.handle;
 		player.gameFlow();
 		return;
@@ -639,7 +619,6 @@ let player = {
 		}
 		let pg = document.getElementById('playerGrid').appendChild(document.createElement('div'));;
 		
-		//let pgd = pg.appendChild(document.createElement('div'));
 		pg.id=handle;
 		pg.innerHTML=handle;
 
@@ -712,7 +691,7 @@ let move = {
 		let mdel = document.createElement('div');
 		mdel.innerHTML='Delete';
 		mdel.id = 'del_' + mv.id;
-		move._set_mvListeners(mv);
+		move.set_mvListeners(mv);
 
 		mv.appendChild(mdtl);
 		mv.appendChild(mdel);
@@ -724,36 +703,42 @@ let move = {
 		moveStruct.orientation = m.orientation;
 		moveStruct.shipType = m.shipType;
 		moveStruct.size = m.shipSize;
+		//moveStruct.undo = m.undo || undefined;
 
 		return moveStruct;
 	},
 
 	// Add delete move function
-	_set_mvListeners: function(mv){
+	set_mvListeners: function(mv){
 		mv.addEventListener('click', (function() {
 			// Check to see if another ship is in the path of the attempted restore
-			if (fleet.validateShip(move.undo, move.shipType)) {
-				// Remove the div
-				// Need to know parent element which, for everything in the move list, is the element whose id is playOrder
-				let p = document.getElementById('playOrder');
-				let dmv = document.getElementById(mv.id);
-				p.removeChild(dmv);
-
-				// Delete the entry from the array
-				//move.moveList.push(mv);
-				for (let l in move.moveList) {
-					if(move.moveList[l].id == mv.id){
-						move.moveList.splice(l,1);
-						break;
-					}
-				}
-
+			if (mv.id.match(/^attack/) ){
+				move.delete_move(mv);
+			} else if (fleet.validateShip(move.undo, move.shipType )) {
+				move.delete_move(mv);
 				// Repaint the original ship
 				grid.displayShip(move.shipType);
 				fleet.setFleet (move.orientation, move.shipType, ships.getShip(move.shipType).size, move.ghost[0], 0); 
 				grid.displayShip(move.ships, move.shipType);
 			}
 		}));
+	},
+
+	delete_move: function(mv){
+		// Remove the div
+		// Need to know parent element which, for everything in the move list, is the element whose id is playOrder
+		let p = document.getElementById('playOrder');
+		let dmv = document.getElementById(mv.id);
+		p.removeChild(dmv);
+
+		// Delete the entry from the array
+		for (let l in move.moveList) {
+			if(move.moveList[l].id == mv.id){
+				move.moveList.splice(l,1);
+				break;
+			}
+		}
+
 	},
 
 	// Set up drag drop functionality for setting move order
@@ -781,7 +766,7 @@ let move = {
 	},
 
 	alterMoveIndex: function(startIndex, endIndex){
-		startId = startIndex;
+		let startId = startIndex;
 		startIndex = parseInt(move.moveMap[startIndex]);
 		endIndex   = parseInt(move.moveMap[endIndex]);
 
@@ -804,34 +789,32 @@ let move = {
 		let parent = document.getElementById('playOrder');
 		console.log('Resolving moves');
 		for(let m in move.moveList) {
-			let move = move.moveList[m];
-			console.log('move: ', move);
-			switch(move.type) {
+			let mv = move.moveList[m];
+			console.log('move: ', mv);
+			switch(mv.type) {
 				case 'attack': 
-					grid.attackPlayer(move.coordinate);
+					grid.attackPlayer(mv.coordinate);
 					break;
 				case 'mine':
-					grid.setMine(move.coordinate);
+					grid.setMine(mv.coordinate);
 					break;
 				case 'move':
-					//moveShip(fleet, ships, grid, move);
 					grid.moveShip();
 					break;
 				case 'pivot':
 					break;
 			}
-		let child = document.getElementById(move.id);
+		let child = document.getElementById(mv.id);
 		parent.removeChild(child);
 		}
 	},
 
-	//let moveShip = function(fleet, ships, grid, move){}
 	moveShip: function(move){
 		// Check for mines based on ghost - send message to mine service
-		let blastAt = grid._check_for_mine(move.ghost);
+		let blastAt = grid.check_for_mine(move.ghost);
 		if (blastAt != false){
 			// Reset ghost if mine found - If a mine has been encountered then the ship only moves to the point of the blast
-			grid._resetGhost(blastAt);
+			grid.resetGhost(blastAt);
 			// find which square got hit
 			let target;
 			for(let m in move.ghost){
@@ -861,7 +844,7 @@ let move = {
 		}
 	},
 
-	_resetGhost: function(blastAt){
+	resetGhost: function(blastAt){
 		for (let i in move.ghost){
 			if (blastAt == move.ghost[i]) break;
 		}
@@ -870,7 +853,7 @@ let move = {
 	},
 
 	// Stub for mine detection
-	_check_for_mine: function (g){
+	check_for_mine: function (g){
 		let mineAt = {'0_6': 1, '1_6': 1, '2_6': 1, '3_6': 1, '4_6': 1, '5_6': 1, '6_6': 1, '7_6': 1, '8_6': 1, '9_6': 1};
 		for(let i in g) {
 			// return location where mine struck
@@ -894,11 +877,8 @@ let move = {
 	},
 
 	setMove: function(m){
-		//let moveString;
 		if(move.moveMap[m.coordinate] == undefined) {
 			move.moveMap[m.coordinate] = move.moveList.length;
-			//moveString = move.type + ': ' + move.coordinate;
-			//let b = move.moveListBlock(move.coordinate, moveString);
 			let mv = move.moveListBlock(m);
 			move.moveList.push(mv);
 			document.getElementById('playOrder').appendChild(mv.dom);
@@ -960,14 +940,6 @@ let wholeFleet = fleet.getWholeFleet();
 for (let t in wholeFleet) {
 	grid.displayShip(t);
 }
-/*
-ships.buildShips();
-ships.placeShips(fleet);
-let wholeFleet = fleet.getWholeFleet(fleet);
-for (let t in wholeFleet) {
-	grid.displayShip(ships, t);
-}
-*/
 
 /* 
  * Mock game will be removed 
@@ -976,10 +948,7 @@ let m = document.getElementById('MeganReg');
 m.addEventListener('click', 
     function(){
         player.acceptReg('Megan', 1);
-        //m.style.display='none';
         document.getElementById('MeganReg').style.display='none';
-	//document.getElementById(player.flow[player.currentFlow]).style.display='none';
-        //m.appendChild(document.createElement('p'));
     }, false);
 
 let ry = document.getElementById('RyanReg');
@@ -987,8 +956,6 @@ ry.addEventListener('click',
     function(){
         player.acceptReg('Ryan', 2);
         document.getElementById('RyanReg').style.display='none';
-        //let r=document.getElementById('Ryan').style.display='none';
-        //r.appendChild(document.createElement('p'));
     }, false);
 
 let tr = document.getElementById('TraceyReg');
