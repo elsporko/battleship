@@ -243,11 +243,11 @@ let grid = {
 			    ev.dataTransfer.setData("text/plain", 
 				JSON.stringify({
 						offset:        start.offset,
-						start_coord:   start.start_coord,
+						start_coord:   (fleet.readMap(type)).start_coord,
 						index:         ship.size,
 						type:          type,
-						current_coord: fleet.ghostShip(type, start.start_coord),
-						orientation:   ship.orientation
+						current_coord: fleet.ghostShip(type, start.start_pos),
+						orientation:   (fleet.readMap(type)).orientation
 					       })
 			    );
 			})
@@ -703,7 +703,7 @@ let move = {
 		moveStruct.orientation = m.orientation;
 		moveStruct.shipType = m.shipType;
 		moveStruct.size = m.shipSize;
-		//moveStruct.undo = m.undo || undefined;
+		moveStruct.undo = m.undo || undefined;
 
 		return moveStruct;
 	},
@@ -711,15 +711,16 @@ let move = {
 	// Add delete move function
 	set_mvListeners: function(mv){
 		mv.addEventListener('click', (function() {
+			let m = move.getMove(mv);
 			// Check to see if another ship is in the path of the attempted restore
 			if (mv.id.match(/^attack/) ){
 				move.delete_move(mv);
-			} else if (fleet.validateShip(move.undo, move.shipType )) {
+			} else if (fleet.validateShip(m.undo, m.shipType )) {
 				move.delete_move(mv);
 				// Repaint the original ship
-				grid.displayShip(move.shipType);
-				fleet.setFleet (move.orientation, move.shipType, ships.getShip(move.shipType).size, move.ghost[0], 0); 
-				grid.displayShip(move.ships, move.shipType);
+				grid.displayShip(m.shipType);
+				fleet.setFleet (m.orientation, m.shipType, ships.getShip(m.shipType).size, m.ghost[0], 0); 
+				grid.displayShip(m.shipType);
 			}
 		}));
 	},
@@ -732,13 +733,16 @@ let move = {
 		p.removeChild(dmv);
 
 		// Delete the entry from the array
+		move.moveList.splice(move.getMove(mv),1);
+	},
+
+	getMove: function (mv){
 		for (let l in move.moveList) {
 			if(move.moveList[l].id == mv.id){
-				move.moveList.splice(l,1);
+				return move.moveList[l]
 				break;
 			}
 		}
-
 	},
 
 	// Set up drag drop functionality for setting move order
@@ -809,7 +813,7 @@ let move = {
 		}
 	},
 
-	moveShip: function(move){
+	moveShip: function(){
 		// Check for mines based on ghost - send message to mine service
 		let blastAt = grid.check_for_mine(move.ghost);
 		if (blastAt != false){
