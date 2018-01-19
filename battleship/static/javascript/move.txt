@@ -1,0 +1,25 @@
+Implementing move class.
+
+Move class represents the steps taken during a player's turn.
+
+During their move a player can make as many moves as their are opponents. A move can be:
+	* Attack another player (similar to traditional battleship, but the attack can be on any active player).
+	* Move any of their own ship in the direction that the ship is currently facing (E <-> W or N <=-> S). Restrictions on a move are;
+		* Final move destination cannot have the ship overlap an existing ship
+		* Ships that have been hit cannot be moved
+		* If there is a damaged ship in the path of the a ship being moved that represents the boundary for how far the ship can be moved.
+		* If any part of the ship ends up where an opponent has dropped a mine that ship is hit on that space
+ 	* Pivot any own ship so that the ship's direction is changed. (E <-> W <=>  N <-> S).
+		* Pivots happen on the given point selected by the player
+		* Final move destination cannot have the ship overlap an existing ship
+		* Ships that have been hit cannot be moved
+		* If there is a damaged ship in the path of the a ship being moved that represents the boundary for how far the ship can be moved.
+		* If any part of the ship ends up where an opponent has dropped a mine that ship is hit on that space
+	* Drop a mine onto any opponent's grid. There will be a limited number of mines to drop
+
+Moves are executed all at once in the order assigned by the player. Moves can be reordered before being executed. If one move conflicts with or affects
+another then affected rules will not be executed. For example, a player moves a destroyer, pivots, attacks another player and then drops a mine on a different player. Upon
+resolving moves the destroyer is hit during the first step so the pivot will not happen. The attack and mine drop parts of the move will occur.
+
+Player moves are displayed as they are made and can be reordered until they are executed. Moves can also be deleted from the list. Deleting attack and mine
+drops are as simple as removing them from the move queue and deleting the corresponding div from the move list.

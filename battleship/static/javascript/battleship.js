@@ -1,4 +1,6 @@
 'use strict';
+require('./aws-sdk.min.js');
+//let Cognito = require ('./amazon-cognito.min.js');
 
 /*** fleet.js ***/
 var fleet = {
@@ -936,6 +938,14 @@ document.getElementById('myGrid').appendChild(grid.clickableGrid(10, 10));
 // Set up drag/drop of moves
 //document.getElementById('playOrder').setAttribute('draggable','true');
 //player.playerOrderHandler();
+
+// Connect to Cognito
+// Initialize the Amazon Cognito credentials provider
+AWS.config.region = 'us-east-2'; // Region
+AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: 'us-east-2:6504e3a7-19ab-43ac-bb04-3b31465f7942',
+});
+
 
 /* Set random fleet */
 ships.buildShips();

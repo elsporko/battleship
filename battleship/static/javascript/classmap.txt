@@ -1,0 +1,99 @@
+/*** grid.js ***/
+/*
+ * Maintain the display.
+ */
+let grid = {
+	moveShip: function(){},
+	setMoveShip: function(){},
+	clickableGrid: function (){},
+	setMyListeners: function(){},
+	setPlayerListeners: function(){},
+	find_start: function(){},
+	displayShip: function (){},
+	setSpace: function(){},
+	getTypeByClass: function(){}
+};
+
+/*** fleet.js ***/
+var fleet = {
+	nauticalMap: {}, // Hash lookup that tracks each ship's starting point and current orientation
+	init: function(){},
+	buildNauticalChart: function(){},
+	getFleet: function(){},
+	getWholeFleet: function(){},
+	setFleet: function (){},
+	clearShip: function(){},
+	ghostShip: function(){},
+	readMap: function(){},
+	checkGrid: function(){},
+	setChart: function(){},
+	validateShip: function (){},
+};
+
+/*** ships.js ***/
+let ships = {
+	ship_config: {},
+	hitCounter: {},
+	sunkCounter: {}, // Tracks which boats have been sunk
+        ~~~~~~~~~~~~~~~~~~~~~~~~
+	// Values for determining bit values when a boat sinks
+	airCraftCarrier: 1,
+	battleship: 2,
+	destroyer: 4,
+	submarine: 8,
+	patrolBoat: 16,
+        ~~~~~~~~~~~~~~~~~~~~~~~~
+	setHitCounter: function (){},
+	setSunkCounter: function (){},
+	getHitCounter: function (){},
+	getSunkCounter: function(){},
+	ship: function(){},
+	buildShips: function (){},
+	buildShip: function(){},
+	setShip: function(){},
+	getShip: function (){},
+	getStartCoordinate: function(){},
+	getRandomCoordinate: function(){},
+	shipString: function(){},
+	placeShips: function (){}
+}
+
+/*** player.js ***/
+let player = {
+	playerRoster: new Object, // Placeholder for all players in the game
+	playerOrder: [], // Order of player turn
+	me: undefined,
+	orderIndex: 0,
+	flow: ['register','game'],
+	currentFlow: undefined,
+	canMove: function() {},
+	register: function(){ ,
+	acceptReg: function(){},
+	myTurn: function(){},
+	nextPlayer: function(){},
+	currentPlayer: function(){},
+	gameFlow: function(){},
+	setMove: function(){},
+}
+
+/*** move.js ***/
+let move = {
+	moveList: [], 
+		List of all moves to be made
+	moveMap: {},
+		When ships are moved as part of a turn their potential move locations are stored here
+	deleteMove: function(){},
+	clearMoveList: function(){},
+	moveListBlock: function(m) {},
+	set_mvListeners: function(){},
+	moveOrderHandler: function(){},
+	alterMoveIndex: function(){},
+	resolveMoves: function(){},
+	moveShip: function(){},
+	resetGhost: function(){},
+	check_for_mine: function(){},
+	attackPlayer: function(){},
+	setMine: function(coordinate){},
+	setMove: function(m){},
+	getMoveSize: function(){}
+}
