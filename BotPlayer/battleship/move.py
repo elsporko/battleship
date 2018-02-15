@@ -4,7 +4,7 @@ class Move:
         self.moveMap = {}
 
     def clearMoveList(self):
-        move.moveList = [];
+        self.moveList = [];
 
     def moveListBlock(self, m):
         moveStruct={};
@@ -20,53 +20,54 @@ class Move:
         return moveStruct;
 
     def getMove(self, mv):
-        for l in move.moveList:
-            if move.moveList[l].id == mv.id:
-                return move.moveList[l]
+        for l in self.moveList:
+            if self.moveList[l].id == mv.id:
+                return self.moveList[l]
 
     def resolveMoves(self):
         console.log('Resolving moves')
         move_actions={
-            'attack': self.attackPlayer(mv.coordinate)
-            'mine':   self.setMine(mv.coordinate)
-            'move':   self.moveShip()
+            'attack': self.attackPlayer(mv.coordinate),
+            'mine':   self.setMine(mv.coordinate),
+            'move':   self.moveShip(),
             'pivot':  self.pivotShip()
         }
-        for m in move.moveList:
-            mv = move.moveList[m]
+        for m in self.moveList:
+            mv = self.moveList[m]
             move_actions[mv.type]
 
     def moveShip(self):
         # Check for mines based on ghost - send message to mine service
-        blastAt = move.check_for_mine(move.ghost);
+        blastAt = self.check_for_mine(self.ghost);
         if blastAt != false:
             # find which square got hit
             target
-            for m in move.ghost:
-                if move.ghost[m] == blastAt:
-                    target=move.ghost[m]
+            for m in self.ghost:
+                if self.ghost[m] == blastAt:
+                    target=self.ghost[m]
                     break
-            ships.setHitCounter(move.shipType, m+1)
+            ships.setHitCounter(self.shipType, m+1)
 
-        fl = fleet.getFleet(move.shipType)
-        s = ships.getShip(move.shipType)
+        fl = fleet.getFleet(self.shipType)
+        s = ships.getShip(self.shipType)
 
-        if fl[0] == move.ghost[0] and move.orientation == s.orientation: # check starting points and orientation set and redisplay only if different
+        if fl[0] == self.ghost[0] and self.orientation == s.orientation: # check starting points and orientation set and redisplay only if different
             # Validate move can be made
-            if fleet.validateShip(move.ghost, move.shipType):
+            if fleet.validateShip(self.ghost, self.shipType):
                 # Set ghost to NauticalChart/Map
-                fleet.setFleet (move.orientation, move.shipType, ships.getShip(move.shipType).size, move.ghost[0], 0)
+                fleet.setFleet (self.orientation, self.shipType, ships.getShip(self.shipType).size, self.ghost[0], 0)
 
     def resetGhost (self, blastAt):
-        for i in move.ghost:
-            if blastAt == move.ghost[i]:
+        for i in self.ghost:
+            if blastAt == self.ghost[i]:
                 break;
 
-        return move.ghost = fleet.ghostShip(move.type, move.ghost[i], move.orientation, move.ghost.length, i)
+        self.ghost = fleet.ghostShip(self.type, self.ghost[i], self.orientation, self.ghost.length, i)
+        return self.ghost
 
     # Stub for mine detection
     def check_for_mine (self, g):
-        mineAt = {'0_6'= 1, '1_6'= 1, '2_6'= 1, '3_6'= 1, '4_6'= 1, '5_6'= 1, '6_6'= 1, '7_6'= 1, '8_6'= 1, '9_6'= 1};
+        mineAt = {'0_6': 1, '1_6': 1, '2_6': 1, '3_6': 1, '4_6': 1, '5_6': 1, '6_6': 1, '7_6': 1, '8_6': 1, '9_6': 1};
         for i in g:
             # return location where mine struck
             if mineAt[g[i]] == 1:
@@ -77,18 +78,20 @@ class Move:
     def attackPlayer (self, coordinate):
         # Send a message requesting hit/miss value on enemy's grid
         # Inform all of enemy's coordinate status
+        return
 
     def setMine(self, coordinate):
         # Send a message requesting hit/miss value on enemy's grid
         # If not a hit register with service that mine placed on enemy grid
+        return
 
     def setMove (self, m):
-        if move.moveMap[m.coordinate] == undefined:
-            move.moveMap[m.coordinate] = move.moveList.length
-            mv = move.moveListBlock(m)
-            move.moveList.push(mv)
+        if self.moveMap[m.coordinate] == undefined:
+            self.moveMap[m.coordinate] = self.moveList.length
+            mv = self.moveListBlock(m)
+            self.moveList.push(mv)
 
     def getMoveSize(self):
-        return move.moveList.length;
+        return self.moveList.length;
 
 

@@ -1,52 +1,54 @@
 class Player:
     def __init__(self):
         self.playerRoster = {} # Placeholder for all players in the game
-        self.playerOrder = [] # Order of player turn
+        self.playerOrder = [0 for x in range(100)] # Order of player turn
+        #self.chart =[[0 for x in range(10)] for y in range(10)] # Map of ship locations
         self.me = {}
         self.orderIndex = 0
         self.flow = ['register','game']
         #self.currentFlow: undefined
         
     def canMove(self):
-        if player.playerOrder.length > move.getMoveSize():
+        if self.playerOrder.length > move.getMoveSize():
             return true;
         return false;
 
     # Register handle
-    def register(self, handle):
-        player.me = handle # Self identify thineself
+    def register(self,handle):
+        self.me = handle # Self identify thineself
         # TODO - call out to the registration service and get back handle and turn order. This
         # structure represents the return call from the registration service.
         reg = { 'handle': 'elsporko',
                 'order': 0
         }
+        print (reg)
 
-        player.playerOrder[reg.order] = reg.handle
-        player.gameFlow()
+        self.playerOrder[reg['order']] = reg['handle']
+        #self.gameFlow()
         return
 
      # Accept registration from other players
     def acceptReg(self, handle, order):
-        player.playerOrder[order] = handle;
-        player.playerRoster = {
+        self.playerOrder[order] = handle;
+        self.playerRoster = {
             [handle]: {'pgrid': fleet.buildNauticalChart}
         }
 
     def myTurn(self):
-        return (1,0)[self.currentPlayer() == player.me]
+        return (1,0)[self.currentPlayer() == self.me]
 
     def nextPlayer(self):
-        player.orderIndex = (0, self.orderIndex + 1)[player.orderIndex == player.playerOrder.length - 1]
+        self.orderIndex = (0, self.orderIndex + 1)[self.orderIndex == self.playerOrder.length - 1]
         return;
 
     def currentPlayer (self):
-        return player.playerOrder[player.orderIndex];
+        return self.playerOrder[self.orderIndex];
 
     def gameFlow(self):
-        if player.currentFlow != undefined:
-            player.currentFlow+=1
+        if self.currentFlow != undefined:
+            self.currentFlow+=1
         else:
-            player.currentFlow = 0
+            self.currentFlow = 0
 
     def setMove(self, m):
         return move.setMove(m);

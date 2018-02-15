@@ -1,8 +1,8 @@
 #!/usr/bin/python3
-from battleship import fleet
-from battleship import ships
-from battleship import player
-from battleship import move
+from battleship.fleet  import Fleet
+#from battleship.ships  import Ships
+from battleship.player import Player
+from battleship.move   import Move
 
 ######################################
 ######################################
@@ -12,7 +12,12 @@ from battleship import move
 #fleet.init();
 #player.gameFlow();
 # Register
-player.register();
+player=Player()
+fleet=Fleet()
+move=Move()
+#ships=Ships()
+player.register('elsporko');
+
 #
 
 #    grid.setMoveShip(); 
@@ -36,8 +41,8 @@ player.register();
 #//player.playerOrderHandler();
 #
 # Set random fleet
-ships.buildShips();
-ships.placeShips();
+fleet.buildShips();
+fleet.placeShips();
 
 #/* 
 # * Mock game will be removed 
