@@ -4,18 +4,11 @@ from battleship.fleet  import Fleet
 from battleship.player import Player
 from battleship.move   import Move
 
-######################################
-######################################
-#
-#/*** battleshipOne.js ***/
-#
-#fleet.init();
-#player.gameFlow();
-# Register
 player=Player()
 fleet=Fleet()
 move=Move()
-#ships=Ships()
+
+# Register
 player.register('elsporko');
 
 #

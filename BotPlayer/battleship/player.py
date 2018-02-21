@@ -1,3 +1,5 @@
+import boto3
+
 class Player:
     def __init__(self):
         self.playerRoster = {} # Placeholder for all players in the game
@@ -6,6 +8,9 @@ class Player:
         self.me = {}
         self.orderIndex = 0
         self.flow = ['register','game']
+        self.sns_client = boto3.client('sns')
+        self.sqs_client = boto3.client('sqs')
+        self.fake_names = ['Hugh Mann', 'elsporko', 'Amanda Hugenkiz', 'Not A Bot']
         #self.currentFlow: undefined
         
     def canMove(self):
@@ -15,16 +20,28 @@ class Player:
 
     # Register handle
     def register(self,handle):
-        self.me = handle # Self identify thineself
+        queue = self.sqs_client.get_queue_by_name(QueueName='Battleship_Registration.fifo')
+        #queue = sqs_client.create_queue(QueueName='Battleship_Registration.fifo', Attributes={'FifoQueue':'true', 'ContentBasedDeduplication': 'true'})
+        #TODO Create a random string representing the queue to use for this player. Check to make sure it does not already exist before creating it.
+        sqs_arn = queue.get_queue_attributes(QueueUrl=queue['QueueUrl'], AttributeNames=['QueueArn'])['Attributes']['QueueArn']
+
+        # This topic should already exist but creation is idempotent and we need the arn to subscribe to it
+        game_topic = self.sns_client.create_topic(Name='Battleship_Registration')
+        sns_arn = game_topic['TopicArn']
+
+        self.sns_client.subscribe(TopicArn=sns_arn, Protocol='sqs', Endpoint=sqs_arn)
+        self.sns_client.publish(TopicArn=sns_arn, Message='Comet is helping')
+
+        my_topic = self.sns_client.create_topic(Name='elsporko')
+
+        #self.me = handle # Self identify thineself
         # TODO - call out to the registration service and get back handle and turn order. This
         # structure represents the return call from the registration service.
-        reg = { 'handle': 'elsporko',
-                'order': 0
-        }
-        print (reg)
+        #reg = { 'handle': 'elsporko',
+        #        'order': 0
+        #}
 
         self.playerOrder[reg['order']] = reg['handle']
-        #self.gameFlow()
         return
 
      # Accept registration from other players

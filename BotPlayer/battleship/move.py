@@ -62,7 +62,7 @@ class Move:
             if blastAt == self.ghost[i]:
                 break;
 
-        self.ghost = fleet.ghostShip(self.type, self.ghost[i], self.orientation, self.ghost.length, i)
+        self.ghost = fleet.ghostShip(self.shipType, self.ghost[i], self.orientation, self.ghost.length, i)
         return self.ghost
 
     # Stub for mine detection

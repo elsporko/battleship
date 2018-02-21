@@ -1,49 +1,35 @@
 import boto3
 
-sqs = boto3.resource('sqs')
+sns_client = boto3.client('sns')
+sqs_client = boto3.client('sqs')
 
-queue = sqs.create_queue(QueueName='battleship.fifo', Attributes={'FifoQueue':'true', 'ContentBasedDeduplication': 'true'})
-#print (queue.url)
-#print (queue.attributes)
+# Create topic
+sns_game_topic = sns_client.create_topic(Name='Battleship_Registration')
 
-queue = sqs.get_queue_by_name(QueueName='battleship.fifo')
-#response = queue.send_message(MessageBody='battleMessage', MessageAttributes={
-#    'MoveType': {
-#        'StringValue': 'Attack',
-#        'DataType': 'String'
-#    },
-#    'Position': {
-#        'StringValue': '0_0',
-#        'DataType': 'String'
-#    }
-#})
+# Create queue
+queue = sqs_client.create_queue(QueueName='Battleship_Registration.fifo', Attributes={'FifoQueue':'true', 'ContentBasedDeduplication': 'true'})
+sqs_arn = sqs_client.get_queue_attributes(QueueUrl=queue['QueueUrl'], AttributeNames=['QueueArn'])['Attributes']['QueueArn']
 
-response = queue.send_messages(Entries=[
-    {
-        'Id': '1',
-        'MessageBody': 'Attack',
-        'MessageGroupId': 'AttackMegan',
-        'MessageAttributes': {
-            'AttackMegan':{
-                'StringValue': '0_0',
-                'DataType': 'String'
-            }
-        }
-    },
-    {
-        'Id': '2',
-        'MessageBody': 'Attack2',
-        'MessageGroupId': 'AttackRyan',
-        'MessageAttributes': {
-            'AttackRyan':{
-                'StringValue': '0_0',
-                'DataType': 'String'
-            }
-        }
-    }
-    ])
+sns_arn = sns_game_topic['TopicArn']
 
-print (response)
-#queue = sqs.create_queue(QueueName='battleship')
-#print (queue.url)
-#print (queue.attributes)
+#print ("sns_arn: ", sns_arn)
+#print ("sqs_arn: ", sqs_arn)
+#print ("sqs_url: ", queue['QueueUrl'])
+
+sns_client.subscribe(TopicArn=sns_arn, Protocol='sqs', Endpoint=sqs_arn)
+#while(1):
+#message1 = sqs_client.receive_message(QueueUrl=queue['QueueUrl'])
+#print ("message1: ", message1)
+#print ("message1: ", message1['Messages'])
+
+while True:
+    messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'])
+    if 'Messages' in messages: # when the queue is exhausted, the response dict contains no 'Messages' key
+        for message in messages['Messages']: # 'Messages' is a list
+            # process the messages
+            print(message['Body'])
+            # next, we delete the message from the queue so no one else will process it again
+            sqs_client.delete_message(QueueUrl=queue['QueueUrl'], ReceiptHandle=message['ReceiptHandle'])
+#    else:
+#        print('Queue is now empty')
+#        break

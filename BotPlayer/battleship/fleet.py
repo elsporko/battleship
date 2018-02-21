@@ -23,15 +23,15 @@ class Fleet:
         self.patrolBoat = 16,
         #self.chart =[[0 for x in range(10)] for y in range(10)] # Map of ship locations
 
-    def getFleet(self, type):
-        orientation = (0,1) [self.nauticalMap[type].orientation]
+    def getFleet(self, shipType):
+        orientation = (0,1) [self.nauticalMap[shipType]['orientation'] == 'x']
 
-        pieces = self.nauticalMap[type].start_coord.split('_')
+        pieces = self.nauticalMap[shipType]['start_coord'].split('_')
         ret = []
 
-        while pieces[orientation] < self.nauticalChart[orientation].length and self.nauticalChart[pieces[0]][pieces[1]] == type:
-            ret.append (pieces[0] + '_' + pieces[1])
-            pieces[orientation] = pieces[orientation] + 1
+        while int(pieces[orientation]) < len(self.nauticalChart[orientation]) and self.nauticalChart[int(pieces[0])][int(pieces[1])] == shipType:
+            ret.append ("{}_{}".format(pieces[0], pieces[1]))
+            pieces[orientation] = int(pieces[orientation]) + 1
         return ret
 
     def getWholeFleet(self):
@@ -40,31 +40,29 @@ class Fleet:
             ret[t] = self.getFleet(t)
         return ret
  
-    def setFleet (self, orientation, type, size, start_coord, offset):
+    def setFleet (self, orientation, shipType, size, start_coord, offset=0):
          pieces = start_coord.split('_');
          index = (0, 1)[orientation == 'x']
  
-         offset = offset or 0;
- 
          # Adjust for drag/drop when player picks a ship piece other than the head.
-         pieces[index] = pieces[index] - offset;
+         pieces[index] = int(pieces[index]) - offset;
  
          #Remove old ship from nauticalChart/Map
-         self.clearShip(type, size);
+         self.clearShip(shipType, size);
  
          # set the nautical map value for this boat
-         self.nauticalMap[type]={
-             orientation: orientation,
-             start_coord: pieces[0] + '_' + pieces[1]
+         self.nauticalMap[shipType]={
+             'orientation': orientation,
+             'start_coord': "{}_{}".format(int(pieces[0]), int(pieces[1]))
          }
  
          for i in range(size):
-             self.nauticalChart[pieces[0]][pieces[1]] = type;
-             pieces[index] = pieces[index] + 1;
+             self.nauticalChart[int(pieces[0])][int(pieces[1])] = shipType;
+             pieces[index] = int(pieces[index]) + 1;
 
-    def clearShip (self, type, size):
-        map = self.nauticalMap[type];
-        if map:
+    def clearShip (self, shipType, size):
+        # Stop processing if the ship is not yet listed or if the ship exists on the space being cleared
+        if shipType not in self.nauticalMap or self.nauticalMap[shipType]:
             return False
 
         pieces = map.start_coord.split('_')
@@ -74,16 +72,16 @@ class Fleet:
             self.nauticalChart[pieces[0]][pieces[1]]=undefined
             pieces[index]+=1
 
-        del self.nauticalMap[type]
+        del self.nauticalMap[shipType]
 
     # 
     # ghostShip - Before putting a ship on the chart it's potential location needs to be plotted so it can be
     # checked for validity. Given a ship this function will return the potential plotted coordinates. The function
     # may build coordinates for a known ship or for one moved around on the grid.
     # 
-    def ghostShip (self, type, coordinate, orientation=None, size=None, offset=None):
-        ship = self.getShip(type)
-        thisShip = self.readMap(type)
+    def ghostShip (self, shipType, coordinate, orientation=None, size=None, offset=None):
+        ship = self.getShip(shipType)
+        thisShip = self.readMap(shipType)
         ghost = []
         coordinate = coordinate or thisShip['start_coord']
         orientation = orientation or thisShip['orientation']
@@ -99,10 +97,10 @@ class Fleet:
 
         return ghost
 
-    def readMap(self, type):
+    def readMap(self, shipType):
         mapval = None
-        if type in self.nauticalMap:
-            mapval = self.nauticalMap[type]
+        if shipType in self.nauticalMap:
+            mapval = self.nauticalMap[shipType]
         return mapval
 
     # 
@@ -114,7 +112,7 @@ class Fleet:
             ret = []
             for c in range(len(coordinates)):
                 s = self.setChart(coordinates[c])
-                if s == False:
+                if s != 0:
                     return False
                 ret.append (s)
             return ret
@@ -122,7 +120,7 @@ class Fleet:
             return self.setChart(coordinates)
 
     def setChart (self, coordinate):
-        pieces = coordinate.split('_');
+        pieces = coordinate.split('_')
         if int(pieces[0]) >= len(self.nauticalChart) or int(pieces[1]) >= len(self.nauticalChart[int(pieces[0])]):
             return False
 
@@ -133,7 +131,7 @@ class Fleet:
     #     * ship must be on the grid
     #     * ship must not occupy the same square as any other ship
     # 
-    def validateShip (self, coordinates, type=None):
+    def validateShip (self, coordinates, shipType=None):
         # Make sure there are no other boats already on any a space
         for p in range(len(coordinates)):
 
@@ -143,22 +141,25 @@ class Fleet:
             if collision == False:
                 return False # If checkGrid returns false coordinates are out of range
 
-            for c in coordinates:
+            for c in range(len(coordinates)):
                 pieces = coordinates[c].split('_')
-                if self.nauticalChart[pieces[0]][pieces[1]] != type and self.nauticalChart[pieces[0]][pieces[1]] != undefined: 
+                if int(pieces[0]) >= len(self.nauticalChart) or int(pieces[1]) >= len(self.nauticalChart[int(pieces[0])]):
                     return False
-        return true
+                if self.nauticalChart[int(pieces[0])][int(pieces[1])] != shipType and self.nauticalChart[int(pieces[0])][int(pieces[1])] != 0:
 
-    def setHitCounter (self, type, bit):
-        self.hitCounter[type] = self.ship_config[type].mask^(bit*bit)
-        if self.hitCounter[type] == self.ship_config[type].mask: # I don't know if this is correct but the idea is check to see if the ship is sunk and flag it if need be
-            self.setSunkCounter(type)
+                    return False
+        return True
 
-    def setSunkCounter(self, type):
-        self.sunkCounter = self.sunkCounter^type;
+    def setHitCounter (self, shipType, bit):
+        self.hitCounter[shipType] = self.ship_config[shipType].mask^(bit*bit)
+        if self.hitCounter[shipType] == self.ship_config[shipType].mask: # I don't know if this is correct but the idea is check to see if the ship is sunk and flag it if need be
+            self.setSunkCounter(shipType)
 
-    def getHitCounter (self, type):
-        return self.hitCounter[type]
+    def setSunkCounter(self, shipType):
+        self.sunkCounter = self.sunkCounter^shipType;
+
+    def getHitCounter (self, shipType):
+        return self.hitCounter[shipType]
 
     def getSunkCounter (self):
         return self.sunkCounter
@@ -183,22 +184,22 @@ class Fleet:
         #ships = [0 for x in range(10)]
         ships = {}
         for s in self.ship_config:
-            ships[s] = {'size': self.ship_config[s]['size'], 'type': self.ship_config[s]['id'], 'label': self.ship_config[s]['label']}
+            ships[s] = {'size': self.ship_config[s]['size'], 'shipType': self.ship_config[s]['id'], 'label': self.ship_config[s]['label']}
         return ships
 
-    def buildShip (self, type):
-        ships[type] = self.ship(self.ship_config[type]['size'], self.ship_config[type]['id'], self.ship_config[type]['label'])
+    def buildShip (self, shipType):
+        ships[shipType] = self.ship(self.ship_config[shipType]['size'], self.ship_config[shipType]['id'], self.ship_config[shipType]['label'])
         return ships;
 
     # Set value in ship object. 
-    def setShip (self, type, key, value):
-        if type and ships[type] and key: # only attempt an update if there is a legit ship type and a key
-            ships[type].key = value;
+    def setShip (self, shipType, key, value):
+        if shipType and ships[shipType] and key: # only attempt an update if there is a legit ship type and a key
+            ships[shipType].key = value;
 
     # Return ship object if no type given otherwise return object containing just requested ship
-    def getShip(self, type=None):
-        if type:
-            return self.ship_config[type]
+    def getShip(self, shipType=None):
+        if shipType:
+            return self.ship_config[shipType]
         else:
             return self.ship_config
 
@@ -209,7 +210,6 @@ class Fleet:
         start_x = (self.getRandomCoordinate(size), self.getRandomCoordinate(0))[start_orientation == 'x'] 
         start_y = (self.getRandomCoordinate(size), self.getRandomCoordinate(0))[start_orientation == 'y']
 
-        #return {'coordinate': start_x + '_' + start_y, 'orientation': start_orientation}
         return {'coordinate': "{}_{}".format(start_x, start_y), 'orientation': start_orientation}
 
     # Take ship size and orientation into account when determining the start range value. ex. don't
