@@ -4,23 +4,15 @@ sns_client = boto3.client('sns')
 sqs_client = boto3.client('sqs')
 
 # Create topic
-sns_game_topic = sns_client.create_topic(Name='Battleship_Registration')
+sns_game_topic = sns_client.create_topic(Name='BR_Topic')
 
 # Create queue
-queue = sqs_client.create_queue(QueueName='Battleship_Registration.fifo', Attributes={'FifoQueue':'true', 'ContentBasedDeduplication': 'true'})
+queue = sqs_client.create_queue(QueueName='Battleship_Registration')
 sqs_arn = sqs_client.get_queue_attributes(QueueUrl=queue['QueueUrl'], AttributeNames=['QueueArn'])['Attributes']['QueueArn']
 
 sns_arn = sns_game_topic['TopicArn']
 
-#print ("sns_arn: ", sns_arn)
-#print ("sqs_arn: ", sqs_arn)
-#print ("sqs_url: ", queue['QueueUrl'])
-
 sns_client.subscribe(TopicArn=sns_arn, Protocol='sqs', Endpoint=sqs_arn)
-#while(1):
-#message1 = sqs_client.receive_message(QueueUrl=queue['QueueUrl'])
-#print ("message1: ", message1)
-#print ("message1: ", message1['Messages'])
 
 while True:
     messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'])
