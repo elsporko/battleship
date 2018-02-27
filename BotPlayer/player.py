@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 from battleship.fleet  import Fleet
-#from battleship.ships  import Ships
 from battleship.player import Player
 from battleship.move   import Move
 
@@ -10,12 +9,8 @@ move=Move()
 
 # Register
 player.register('elsporko');
-
 #
 
-#    grid.setMoveShip(); 
-#        playGame();
-#
 #// Set up link to resolve moves
 #let d=document.getElementById('doMoves');
 #d.addEventListener('click',
@@ -29,8 +24,6 @@ player.register('elsporko');
 #
 #    }, false);
 #
-#// Set up drag/drop of moves
-#//document.getElementById('playOrder').setAttribute('draggable','true');
 #//player.playerOrderHandler();
 #
 # Set random fleet
