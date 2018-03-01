@@ -1,6 +1,7 @@
 import boto3
 import json
 import pprint
+from battleship.sqs_policy import SQS_Policy
 
 class Player:
     def __init__(self):
@@ -22,6 +23,7 @@ class Player:
 
     # Register handle
     def register(self,handle):
+        sqs_policy = SQS_Policy()
         pp=pprint.PrettyPrinter(indent=4)
 
         # Get registration queue
@@ -34,6 +36,10 @@ class Player:
         # Create topic for commuications to this bot
         topic_arn = self.sns_client.create_topic(Name='elsporko')
 
+        # Tie topic to queue
+        policy = sqs_policy.get_policy('elsporko', 'Battleship_Registration', queue['QueueUrl'])
+        self.sqs_client.set_queue_attributes(QueueUrl=queue['QueueUrl'], Attributes={'Policy': policy})
+
         # Connect topic to queue
         # Subscribe to own topic
         self.sns_client.subscribe(TopicArn=topic_arn['TopicArn'], Protocol='sqs', Endpoint=sqs_arn)
@@ -43,6 +49,7 @@ class Player:
         pub = self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=message)
         print("Published: ")
         pp.pprint(pub)
+        print("message: ", message)
 
         # Keep trying to register a unique handle
         while True:
@@ -53,6 +60,7 @@ class Player:
             pp.pprint(rsp)
             payload=rsp
             #payload = dict(item.split("=") for item in rsp['Message'].split(";"))
+            print("payload: ", payload)
             if 'registration' in payload and payload['registration']=='SUCCESS':
                 self.playerRoster[payload['handle']]={
                     'me': 1,
@@ -60,6 +68,7 @@ class Player:
                     'topic-arn': payload['topic-arn']
                 }
                 self.playerOrder[payload['order']]=payload['handle']
+                print ("Roster: ", self.playerRoster)
             break
         return
 
@@ -88,5 +97,4 @@ class Player:
 
     def setMove(self, m):
         return move.setMove(m);
-
 

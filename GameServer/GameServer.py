@@ -1,6 +1,7 @@
 import boto3
 import json
 from game.game import Game
+from game.sqs_policy import SQS_Policy
 
 game=Game()
 
@@ -14,32 +15,11 @@ sns_arn = sns_game_topic['TopicArn']
 # Create queue
 queue = sqs_client.create_queue(QueueName='Battleship_Registration')
 sqs_arn = sqs_client.get_queue_attributes(QueueUrl=queue['QueueUrl'], AttributeNames=['QueueArn'])['Attributes']['QueueArn']
-policy = sqs_client.get_queue_attributes(QueueUrl=queue['QueueUrl'], AttributeNames=['Policy'])
-policy_skeleton={}
-if 'Policy' not in policy:
-    policy_skeleton={
-        "Version": "2012-10-17",
-        "Id": "arn:aws:sqs:us-east-2:849664249614:Battleship_Registration/SQSDefaultPolicy",
-        "Statement": [
-            {
-              "Sid": "Topic2SQS",
-              "Effect": "Allow",
-              "Principal": {
-                "AWS": "*"
-              },
-              "Action": "SQS:SendMessage",
-              "Resource": "arn:aws:sqs:us-east-2:849664249614:Battleship_Registration",
-              "Condition": {
-                "ArnEquals": {
-                  "aws:SourceArn": "arn:aws:sns:us-east-2:849664249614:BR_Topic"
-                }
-              }
-           }
-        ]
-    }
+sqs_policy = SQS_Policy()
 
 # Tie queue with topic
-sqs_client.set_queue_attributes(QueueUrl=queue['QueueUrl'], Attributes={'Policy': json.dumps(policy_skeleton)})
+policy = sqs_policy.get_policy('BR_Topic', 'Battleship_Registration', queue['QueueUrl'])
+sqs_client.set_queue_attributes(QueueUrl=queue['QueueUrl'], Attributes={'Policy': policy})
 
 # Subscribe to topic
 sns_client.subscribe(TopicArn=sns_arn, Protocol='sqs', Endpoint=sqs_arn)
