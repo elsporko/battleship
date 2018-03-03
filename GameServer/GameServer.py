@@ -8,22 +8,27 @@ game=Game()
 sns_client = boto3.client('sns')
 sqs_client = boto3.client('sqs')
 
+print("Creating topic BR_Topic")
 # Create topic
 sns_game_topic = sns_client.create_topic(Name='BR_Topic')
 sns_arn = sns_game_topic['TopicArn']
 
+print("Creating queue Battleship_Registration")
 # Create queue
 queue = sqs_client.create_queue(QueueName='Battleship_Registration')
 sqs_arn = sqs_client.get_queue_attributes(QueueUrl=queue['QueueUrl'], AttributeNames=['QueueArn'])['Attributes']['QueueArn']
 sqs_policy = SQS_Policy()
 
+print ("Tie topic to queue")
 # Tie queue with topic
 policy = sqs_policy.get_policy('BR_Topic', 'Battleship_Registration', queue['QueueUrl'])
 sqs_client.set_queue_attributes(QueueUrl=queue['QueueUrl'], Attributes={'Policy': policy})
 
+print ("Subscribing to topic")
 # Subscribe to topic
 sns_client.subscribe(TopicArn=sns_arn, Protocol='sqs', Endpoint=sqs_arn)
 
+print ("GAME ON!!!!")
 def process_message(message):
     msg = json.loads(message)
     payload = dict(item.split("=") for item in msg['Message'].split(";"))
@@ -33,12 +38,15 @@ def process_message(message):
 
     print("processing: ", payload['action'])
     # Message formatted in comma delimited key/value pairs separated by semicolons
-    actions[payload['action']]
+    try:
+        actions[payload['action']]
+    except KeyError:
+        return
 
 def register(payload):
     message = 'registration=FAIL'
     print ("Roster: ", game.playerRoster)
-    if payload['handle'] not in game.playerRoster:
+    if 'handle' in payload and payload['handle'] not in game.playerRoster:
         game.playerRoster[payload['handle']]={'handle': payload['handle'], 'arn': payload['topic_arn'], 'order': game.order}
         game.order += 1
         print("players: ", game.playerRoster)

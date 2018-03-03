@@ -1,6 +1,7 @@
 import boto3
 import json
 import pprint
+from random import *
 from battleship.sqs_policy import SQS_Policy
 
 class Player:
@@ -45,32 +46,42 @@ class Player:
         self.sns_client.subscribe(TopicArn=topic_arn['TopicArn'], Protocol='sqs', Endpoint=sqs_arn)
 
         # Prepare and publish registration message
-        message = "action=register;handle=elsporko;topic_arn={}".format(topic_arn['TopicArn']) 
-        pub = self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=message)
-        print("Published: ")
-        pp.pprint(pub)
-        print("message: ", message)
+        message = "action=register;handle={};topic_arn={}".format(self.get_fake_name(),topic_arn['TopicArn']) 
+        self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=message)
+
+        registered = False
 
         # Keep trying to register a unique handle
-        while True:
-            response = self.sqs_client.receive_message(QueueUrl=queue['QueueUrl'])
-            #rsp = json.loads(response)
-            rsp=response
-            print("rsp: ")
-            pp.pprint(rsp)
-            payload=rsp
-            #payload = dict(item.split("=") for item in rsp['Message'].split(";"))
-            print("payload: ", payload)
-            if 'registration' in payload and payload['registration']=='SUCCESS':
-                self.playerRoster[payload['handle']]={
-                    'me': 1,
-                    'order': payload['order'],
-                    'topic-arn': payload['topic-arn']
-                }
-                self.playerOrder[payload['order']]=payload['handle']
-                print ("Roster: ", self.playerRoster)
-            break
+        while not registered:
+            payload = self.sqs_client.receive_message(QueueUrl=queue['QueueUrl'])
+            if 'Messages' not in payload:
+                continue
+            for msg in payload['Messages']:
+                receipthandle=msg['ReceiptHandle']
+                msg = dict(item.split("=") for item in json.loads(msg['Body'])['Message'].split(";"))
+                if 'registration' in msg and msg['registration']=='SUCCESS':
+                    self.playerRoster[msg['handle']]={
+                        'me': 1,
+                        'order': int(msg['order']),
+                        'topic_arn': msg['topic_arn']
+                    }
+                    self.playerOrder[int(msg['order'])]=msg['handle']
+                    print ("Roster: ", self.playerRoster)
+                    self.sqs_client.delete_message(QueueUrl=queue['QueueUrl'], ReceiptHandle=receipthandle)
+                    registered=True
+                    print("Should break now")
+                    break
+                elif 'registration' in msg and msg['registration']=='FAIL':
+                    message = "action=register;handle={};topic_arn={}".format(self.get_fake_name(),topic_arn['TopicArn']) 
+                    self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=message)
+                    registered=True
         return
+
+    # return a fake name from the predetermined list
+    def get_fake_name (self):
+        fake_name = self.fake_names[randint(0, len(self.fake_names)) - 1]
+        self.fake_names.remove(fake_name)
+        return fake_name
 
     # Accept registration from other players
     def acceptReg(self, handle, order):
