@@ -1,6 +1,5 @@
 import boto3
 import json
-import pprint
 from random import *
 from battleship.sqs_policy import SQS_Policy
 
@@ -25,7 +24,6 @@ class Player:
     # Register handle
     def register(self,handle):
         sqs_policy = SQS_Policy()
-        pp=pprint.PrettyPrinter(indent=4)
 
         # Get registration queue
         queue = self.sqs_client.create_queue(QueueName='Battleship_Registration')
@@ -46,14 +44,16 @@ class Player:
         self.sns_client.subscribe(TopicArn=topic_arn['TopicArn'], Protocol='sqs', Endpoint=sqs_arn)
 
         # Prepare and publish registration message
-        message = "action=register;handle={};topic_arn={}".format(self.get_fake_name(),topic_arn['TopicArn']) 
+        fake_name = self.get_fake_name()
+        message = "action=register;handle={};topic_arn={}".format(fake_name,topic_arn['TopicArn']) 
         self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=message)
 
         registered = False
+        empty_name_list = False
 
         # Keep trying to register a unique handle
-        while not registered:
-            payload = self.sqs_client.receive_message(QueueUrl=queue['QueueUrl'])
+        while not registered and not empty_name_list:
+            payload = self.sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=10, WaitTimeSeconds=5)
             if 'Messages' not in payload:
                 continue
             for msg in payload['Messages']:
@@ -69,16 +69,21 @@ class Player:
                     print ("Roster: ", self.playerRoster)
                     self.sqs_client.delete_message(QueueUrl=queue['QueueUrl'], ReceiptHandle=receipthandle)
                     registered=True
-                    print("Should break now")
-                    break
                 elif 'registration' in msg and msg['registration']=='FAIL':
-                    message = "action=register;handle={};topic_arn={}".format(self.get_fake_name(),topic_arn['TopicArn']) 
+                    fake_name = self.get_fake_name()
+                    print ("fake_name: ", fake_name)
+                    if not fake_name:
+                        print("fake name list exhausted")
+                        empty_name_list = True 
+                    message = "action=register;handle={};topic_arn={}".format(fake_name, topic_arn['TopicArn']) 
                     self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=message)
-                    registered=True
+                    self.sqs_client.delete_message(QueueUrl=queue['QueueUrl'], ReceiptHandle=receipthandle)
         return
 
     # return a fake name from the predetermined list
     def get_fake_name (self):
+        if len(self.fake_names) == 0:
+            return False 
         fake_name = self.fake_names[randint(0, len(self.fake_names)) - 1]
         self.fake_names.remove(fake_name)
         return fake_name

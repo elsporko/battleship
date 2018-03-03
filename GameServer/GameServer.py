@@ -36,7 +36,6 @@ def process_message(message):
         'register': register(payload),
     }
 
-    print("processing: ", payload['action'])
     # Message formatted in comma delimited key/value pairs separated by semicolons
     try:
         actions[payload['action']]
@@ -48,18 +47,22 @@ def register(payload):
     print ("Roster: ", game.playerRoster)
     if 'handle' in payload and payload['handle'] not in game.playerRoster:
         game.playerRoster[payload['handle']]={'handle': payload['handle'], 'arn': payload['topic_arn'], 'order': game.order}
-        game.order += 1
         print("players: ", game.playerRoster)
         sns_client.subscribe(TopicArn=payload['topic_arn'], Protocol='sqs', Endpoint=sqs_arn)
 
         # message returned to caller
         print ("Publishing to: ", payload['topic_arn'])
         message = "registration=SUCCESS;topic_arn={};order={};handle={}".format(payload['topic_arn'], game.order, payload['handle'])
+        game.order += 1
     print ("registration returning: ", message)
-    sns_client.publish(TopicArn=payload['topic_arn'], Message=message)
+    print ("payload: ", payload)
+    try:
+        sns_client.publish(TopicArn=payload['topic_arn'], Message=message)
+    except KeyError:
+        return
 
 while True:
-    messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'])
+    messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=10, WaitTimeSeconds=5)
     if 'Messages' in messages: # when the queue is exhausted, the response dict contains no 'Messages' key
         for message in messages['Messages']: # 'Messages' is a list
             # process the messages
