@@ -21,7 +21,7 @@ class SQS_Policy:
               "Resource": "arn:aws:sqs:us-east-2:849664249614:Battleship_Registration",
               "Condition": {
                 "ArnEquals": {
-                  "aws:SourceArn": "arn:aws:sns:us-east-2:849664249614:elsporko"
+                  "aws:SourceArn": topic_arn
                 }
               }
             })
@@ -45,4 +45,9 @@ class SQS_Policy:
             if statement['Condition']['ArnEquals']['aws:SourceArn'] == topic_arn and statement['Effect'] == 'Allow':
                 return True
         return False
+
+    def delete_policy(self, Arn, Queue):
+        policy = self.get_queue_policy(Queue)
+        print("deleting policy: ", Arn)
+        print("policy list: ", policy)
 

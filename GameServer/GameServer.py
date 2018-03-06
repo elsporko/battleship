@@ -30,8 +30,7 @@ sns_client.subscribe(TopicArn=sns_arn, Protocol='sqs', Endpoint=sqs_arn)
 
 print ("GAME ON!!!!")
 def process_message(message):
-    msg = json.loads(message)
-    payload = dict(item.split("=") for item in msg['Message'].split(";"))
+    payload = json.loads(message)
     actions = {
         'register': register(payload),
     }
@@ -43,23 +42,28 @@ def process_message(message):
         return
 
 def register(payload):
-    message = 'registration=FAIL'
-    print ("Roster: ", game.playerRoster)
+    message = {"registration": "FAIL"}
+    msg=json.loads(payload['Message'])
+    payload=json.loads(payload['Message'])
     if 'handle' in payload and payload['handle'] not in game.playerRoster:
         game.playerRoster[payload['handle']]={'handle': payload['handle'], 'arn': payload['topic_arn'], 'order': game.order}
-        print("players: ", game.playerRoster)
         sns_client.subscribe(TopicArn=payload['topic_arn'], Protocol='sqs', Endpoint=sqs_arn)
 
         # message returned to caller
-        print ("Publishing to: ", payload['topic_arn'])
-        message = "registration=SUCCESS;topic_arn={};order={};handle={}".format(payload['topic_arn'], game.order, payload['handle'])
+        message = {"registration": "SUCCESS",
+                   "topic_arn": payload["topic_arn"],
+                   "order" : game.order,
+                   "handle" : payload['handle']
+                  }
         game.order += 1
-    print ("registration returning: ", message)
-    print ("payload: ", payload)
     try:
-        sns_client.publish(TopicArn=payload['topic_arn'], Message=message)
+        resp = sns_client.publish(TopicArn=payload['topic_arn'], Message=json.dumps(message))
     except KeyError:
         return
+    except TypeError:
+        return
+
+    print ("Roster: ", game.playerRoster)
 
 while True:
     messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=10, WaitTimeSeconds=5)
@@ -69,7 +73,4 @@ while True:
             process_message(message['Body'])
             # next, we delete the message from the queue so no one else will process it again
             sqs_client.delete_message(QueueUrl=queue['QueueUrl'], ReceiptHandle=message['ReceiptHandle'])
-#    else:
-#        print('Queue is now empty')
-#        break
 

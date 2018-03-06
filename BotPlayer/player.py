@@ -8,7 +8,8 @@ fleet=Fleet()
 move=Move()
 
 # Register
-player.register('elsporko');
+player.register('elsporko')
+player.cleanup_subscription()
 #
 
 #// Set up link to resolve moves
