@@ -1,5 +1,6 @@
 import boto3
 import json
+import sys
 from game.game import Game
 from game.sqs_policy import SQS_Policy
 
@@ -47,23 +48,34 @@ def register(payload):
     payload=json.loads(payload['Message'])
     if 'handle' in payload and payload['handle'] not in game.playerRoster:
         game.playerRoster[payload['handle']]={'handle': payload['handle'], 'arn': payload['topic_arn'], 'order': game.order}
-        sns_client.subscribe(TopicArn=payload['topic_arn'], Protocol='sqs', Endpoint=sqs_arn)
+        try:
+            sub_ret = sns_client.subscribe(TopicArn=payload['topic_arn'], Protocol='sqs', Endpoint=sqs_arn)
+        # Do not register if topic has been deleted
+        except:
+            return
 
         # message returned to caller
         message = {"registration": "SUCCESS",
                    "topic_arn": payload["topic_arn"],
                    "order" : game.order,
-                   "handle" : payload['handle']
+                   "handle" : payload['handle'],
+                   "registered_players" : game.playerRoster
                   }
         game.order += 1
-    try:
-        resp = sns_client.publish(TopicArn=payload['topic_arn'], Message=json.dumps(message))
-    except KeyError:
-        return
-    except TypeError:
-        return
+        try:
+            resp = sns_client.publish(TopicArn=payload['topic_arn'], Message=json.dumps(message))
+            print ("Roster(SUCCESS): {}\n\n".format(game.playerRoster))
+            return
+        except KeyError:
+            print("register KeyError")
+            return
+        except TypeError:
+            print("register TypeError")
+            return
 
-    print ("Roster: ", game.playerRoster)
+    sns_client.publish(TopicArn=payload['topic_arn'], Message=json.dumps(message))
+    print ("Roster(FAIL): {}\n\n".format(game.playerRoster))
+    return
 
 while True:
     messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=10, WaitTimeSeconds=5)

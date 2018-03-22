@@ -1,5 +1,5 @@
 from random import *
-class Fleet:
+class Fleet(object):
     def __init__(self):
         self.nauticalMap = {} # Dictionary lookup that tracks each ship's starting point and current orientation
         self.chart =[[0 for x in range(10)] for y in range(10)] # Map of ship locations

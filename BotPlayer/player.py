@@ -1,70 +1,37 @@
 #!/usr/bin/python3
 from battleship.fleet  import Fleet
-from battleship.player import Player
-from battleship.move   import Move
+#from battleship.roster import Roster
+from battleship.player import Player, Roster
+#from battleship.move   import Move
 
+print("Creating instances...")
+print("Player...")
 player=Player()
+print("Fleet...")
 fleet=Fleet()
-move=Move()
+#print("Move...")
+#move=Move()
 
 # Register
-player.register('elsporko')
-player.cleanup_subscription()
-#
+print("Register player")
+player.register()
+print("Load other players")
+player.load_other_players()
 
-#// Set up link to resolve moves
-#let d=document.getElementById('doMoves');
-#d.addEventListener('click',
-#    function(){
-#        // Resolve orders
-#        move.resolveMoves();
-#        // Reset moves
-#        move.clearMoveList();
-#        // Turn moves over to the next player
-#        // FIXME - Simulating moves for now. Remove when ready for realsies
-#
-#    }, false);
-#
-#//player.playerOrderHandler();
-#
-# Set random fleet
+# Main game loop
+while True:
+    # Main loop steps:
+    #  * Turn change
+    #  * Check if still alive
+    #  * Check for registration and react as needed (Add to known players, ACK?)
+    #  * Make move(s)
+
+print("Cleanup subscription")
+player.cleanup_subscription()
+
+# Concurrent process to add already existing applicants to our roster
+
+# Set up board
+print("Build fleet")
 fleet.buildShips();
 fleet.placeShips();
-
-#/* 
-# * Mock game will be removed 
-# */
-#let m = document.getElementById('MeganReg');
-#m.addEventListener('click', 
-#    function(){
-#        player.acceptReg('Megan', 1);
-#        document.getElementById('MeganReg').style.display='none';
-#    }, false);
-#
-#let ry = document.getElementById('RyanReg');
-#ry.addEventListener('click', 
-#    function(){
-#        player.acceptReg('Ryan', 2);
-#        document.getElementById('RyanReg').style.display='none';
-#    }, false);
-#
-#let tr = document.getElementById('TraceyReg');
-#tr.addEventListener('click', 
-#    function(){
-#        player.acceptReg('Tracey', 3);
-#        document.getElementById('TraceyReg').style.display='none';
-#    }, false);
-#
-#/* Play game */
-#/*
-#while (1) {
-#    player.getTurn();
-#}
-#*/
-#
-#function playGame(){
-#    if (player.myTurn()){
-#        //window.open('','attack', 'height=200,width=200,menubar=no,status=no,titlebar=no,toolbar=no', false );
-#    }
-#}
-#

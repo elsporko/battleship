@@ -1,4 +1,4 @@
-class Move:
+class Move(object):
     def __init__(self):
         self.moveList = []
         self.moveMap = {}
