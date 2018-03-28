@@ -43,46 +43,56 @@ def process_message(message):
         return
 
 def register(payload):
-    message = {"registration": "FAIL"}
     msg=json.loads(payload['Message'])
     payload=json.loads(payload['Message'])
+    message = {"registration": "FAIL", 'arn': payload['arn']}
+    print("register payload: ", payload)
     if 'handle' in payload and payload['handle'] not in game.playerRoster:
-        game.playerRoster[payload['handle']]={'handle': payload['handle'], 'arn': payload['topic_arn'], 'order': game.order}
+        game.playerRoster[payload['handle']]={'handle': payload['handle'], 'arn': payload['arn'], 'order': game.order}
         try:
-            sub_ret = sns_client.subscribe(TopicArn=payload['topic_arn'], Protocol='sqs', Endpoint=sqs_arn)
+            sub_ret = sns_client.subscribe(TopicArn=payload['arn'], Protocol='sqs', Endpoint=sqs_arn)
         # Do not register if topic has been deleted
         except:
+            print("Could not subscribe to endpoint: ", sub_ret)
             return
 
         # message returned to caller
         message = {"registration": "SUCCESS",
-                   "topic_arn": payload["topic_arn"],
+                   "arn": payload["arn"],
                    "order" : game.order,
                    "handle" : payload['handle'],
                    "registered_players" : game.playerRoster
                   }
         game.order += 1
-        try:
-            resp = sns_client.publish(TopicArn=payload['topic_arn'], Message=json.dumps(message))
-            print ("Roster(SUCCESS): {}\n\n".format(game.playerRoster))
-            return
-        except KeyError:
-            print("register KeyError")
-            return
-        except TypeError:
-            print("register TypeError")
-            return
 
-    sns_client.publish(TopicArn=payload['topic_arn'], Message=json.dumps(message))
-    print ("Roster(FAIL): {}\n\n".format(game.playerRoster))
+    try:
+        print("message: ", message)
+        resp = sns_client.publish(TopicArn=payload['arn'], Message=json.dumps(message))
+        print ("Roster: {}\n\n".format(game.playerRoster))
+        return
+    except KeyError:
+        print("payload: ", payload)
+        print("register KeyError")
+        return
+    except TypeError:
+        print("register TypeError")
+        return
+    except NotFound:
+        print("register NotFound - Need to do something more than print")
+        return
+
+    # next, we delete the message from the queue so no one else will process it again
+    sqs_client.delete_message(QueueUrl=queue['QueueUrl'], ReceiptHandle=message['ReceiptHandle'])
+
     return
 
+count=1
 while True:
-    messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=10, WaitTimeSeconds=5)
+    messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=1, WaitTimeSeconds=20)
+    print ("received message({}): {}".format(count, messages))
+    count = count + 1
     if 'Messages' in messages: # when the queue is exhausted, the response dict contains no 'Messages' key
         for message in messages['Messages']: # 'Messages' is a list
             # process the messages
             process_message(message['Body'])
-            # next, we delete the message from the queue so no one else will process it again
-            sqs_client.delete_message(QueueUrl=queue['QueueUrl'], ReceiptHandle=message['ReceiptHandle'])
 

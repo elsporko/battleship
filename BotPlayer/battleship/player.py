@@ -3,15 +3,19 @@ import json
 import random
 import string
 from battleship.roster import Roster
-#from battleship.sqs_policy import SQS_Policy
+from battleship.fleet import Fleet
 
-class Player(Roster):
+class Player(Roster, Fleet):
     def __init__(self):
         # Max number of players is 20 as data is processed on 1 queue and the max number of policies tied to a queue is 20
         self.playerOrder = [None for x in range(20)] # Order of player turn
         self.orderIndex = 0
-        self.fake_names = ['Hugh Mann', 'elsporko', 'Amanda Hugenkiz', 'Not A Bot', "Bender 'Bending' Rodriguez", 'Ann Onimus', 'Hugh Jass']
-        super().__init__()
+        self.fake_names = ['Hugh Mann', 'elsporko', 'Amanda Hugenkiz', 'Not A Bot', "Bender 'Bending' Rodriguez", 'Ann Onimus', 'Hugh Jass', 'Max Power']
+        Roster.__init__(self)
+        Fleet.__init__(self)
+        #super().__init__()
+        #print("player self: ", dir(self))
+        #print("Player MRO: ", Player.__mro__)
         
     def canMove(self):
         if self.playerOrder.length > move.getMoveSize():
@@ -25,7 +29,7 @@ class Player(Roster):
         message = {
             "action": "register",
             "handle": fake_name,
-            "topic_arn": self.my_topic_arn['TopicArn']
+            "arn": self.my_topic_arn['TopicArn']
         }
 
         self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
@@ -35,7 +39,7 @@ class Player(Roster):
 
         # Keep trying to register a unique handle
         while not registered and not empty_name_list:
-            payload = self.sqs_client.receive_message(QueueUrl=self.queue.url, MaxNumberOfMessages=10, WaitTimeSeconds=5)
+            payload = self.sqs_client.receive_message(QueueUrl=self.queue.url, MaxNumberOfMessages=1, WaitTimeSeconds=20)
 
             if 'Messages' not in payload:
                 continue
@@ -49,28 +53,33 @@ class Player(Roster):
                     self.playerRoster[msg['handle']]={
                         'me': 1,
                         'order': int(msg['order']),
-                        'topic_arn': msg['topic_arn']
+                        'arn': msg['arn']
                     }
+                    self.me={'handle': fake_name, 'arn': self.my_topic_arn['TopicArn']}
                     self.playerOrder[int(msg['order'])]=msg['handle']
                     self.otherPlayers=self.load_other_players(msg['registered_players'])
-                    self.sqs_client.delete_message(QueueUrl=self.queue.url, ReceiptHandle=receipthandle)
+                    dmsg = self.sqs_client.delete_message(QueueUrl=self.queue.url, ReceiptHandle=receipthandle)
+                    print ("delete message receipt: ", receipthandle)
+                    print ("delete message status: ", dmsg)
                     registered=True
                 elif 'registration' in msg and msg['registration']=='FAIL':
                     fake_name = self.get_fake_name()
                     if not fake_name:
-                        empty_name_list = True 
+                       empty_name_list = True 
 
                     message = {
                         "action": "register",
                         "handle": fake_name,
-                        "topic_arn": self.my_topic_arn['TopicArn']
+                        "arn": self.my_topic_arn['TopicArn']
                     }
 
-                    self.me={'handle': fake_name, 'arn': self.my_topic_arn['TopicArn']}
                     self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
-                    self.sqs_client.delete_message(QueueUrl=self.queue.url, ReceiptHandle=receipthandle)
+                    dmsg = self.sqs_client.delete_message(QueueUrl=self.queue.url, ReceiptHandle=receipthandle)
+                    print ("delete message receipt: ", receipthandle)
+                    print ("delete message status: ", dmsg)
                 else:
                     print("Should not get here: ", msg)
+                    # Do not delete as this message may be intended for GameServer ignore and move on
         print("roster: ", self.otherPlayers)
         return
 
@@ -89,9 +98,12 @@ class Player(Roster):
     # Accept registration from other players
     def acceptReg(self, handle, order):
         self.playerOrder[order] = handle;
-        self.playerRoster = {
-            [handle]: {'pgrid': fleet.buildNauticalChart}
+        self.playerRoster[handle] = {
+            'pgrid': fleet.buildNauticalChart, # Build chart for other player
+            'order': int(msg['order']),
+            'arn': msg['arn']
         }
+        print("accept reg: ", self.playerRoster)
 
     def myTurn(self):
         return (1,0)[self.currentPlayer() == self.me]
@@ -108,6 +120,10 @@ class Player(Roster):
             self.currentFlow+=1
         else:
             self.currentFlow = 0
+
+    #TODO Move this to the move module
+    def processMoves(self):
+        pass
 
     def setMove(self, m):
         return move.setMove(m);

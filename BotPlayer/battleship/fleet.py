@@ -183,6 +183,7 @@ class Fleet(object):
     def buildShips(self):
         #ships = [0 for x in range(10)]
         ships = {}
+
         for s in self.ship_config:
             ships[s] = {'size': self.ship_config[s]['size'], 'shipType': self.ship_config[s]['id'], 'label': self.ship_config[s]['label']}
         return ships

@@ -1,4 +1,5 @@
 import threading
+import json
 from battleship.sqs_policy import SQS_Policy
 
 class Roster(SQS_Policy):
@@ -8,17 +9,26 @@ class Roster(SQS_Policy):
         super().__init__()
 
     def load_other_players(self, playerlist=None):
-        print("Roster!!!")
-        intro_message={action='player_introduction','handle'=self.me['handle'], 'arn'=self.md['arn']}
+        intro_message={'action': 'playerReg',
+                       'handle': self.me['handle'],
+                       'arn': self.me['arn']}
+
         if playerlist:
             self.otherPlayer = playerlist
+            pr=self.playerRoster
             for handle in playerlist:
-                self.sns_client.publish(TopicArn=playerlist['topic_arn'], Message=json.dumps(intro_message))
+                #TODO - make the publish try/catch in case 
+                #print("handle: ", handle)
+                #print("playerlist[handle]: ", playerlist[handle])
+                self.sns_client.publish(TopicArn=playerlist[handle]['arn'], Message=json.dumps(intro_message))
                 if handle not in self.playerRoster: # Avoid adding 'me' to the roster more than once
-                    self.playerRoster[handle]={
-                        'order': int(playerlist['order']),
-                        'topic_arn': playerlist['topic_arn']
-                    }
+                    plist_arn = playerlist[handle]['arn']
+                    plist_record = json.dumps({
+                        'order': int(playerlist[handle]['order']),
+                        'arn': str(plist_arn)
+                    })
+                    pr[handle]=plist_record
 
-        #return self.playerRoster 
+                    #self.playerRoster[playerlist[handle]]=plist_record
+            self.playerRoster=pr
 
