@@ -13,9 +13,6 @@ class Player(Roster, Fleet):
         self.fake_names = ['Hugh Mann', 'elsporko', 'Amanda Hugenkiz', 'Not A Bot', "Bender 'Bending' Rodriguez", 'Ann Onimus', 'Hugh Jass', 'Max Power']
         Roster.__init__(self)
         Fleet.__init__(self)
-        #super().__init__()
-        #print("player self: ", dir(self))
-        #print("Player MRO: ", Player.__mro__)
         
     def canMove(self):
         if self.playerOrder.length > move.getMoveSize():
@@ -32,6 +29,7 @@ class Player(Roster, Fleet):
             "arn": self.my_topic_arn['TopicArn']
         }
 
+        print("Publish 1")
         self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
 
         registered = False
@@ -39,7 +37,7 @@ class Player(Roster, Fleet):
 
         # Keep trying to register a unique handle
         while not registered and not empty_name_list:
-            payload = self.sqs_client.receive_message(QueueUrl=self.queue.url, MaxNumberOfMessages=1, WaitTimeSeconds=20)
+            payload = self.sqs_client.receive_message(QueueUrl=self.queue.url, MaxNumberOfMessages=1, WaitTimeSeconds=20, VisibilityTimeout=30)
 
             if 'Messages' not in payload:
                 continue
@@ -59,8 +57,6 @@ class Player(Roster, Fleet):
                     self.playerOrder[int(msg['order'])]=msg['handle']
                     self.otherPlayers=self.load_other_players(msg['registered_players'])
                     dmsg = self.sqs_client.delete_message(QueueUrl=self.queue.url, ReceiptHandle=receipthandle)
-                    print ("delete message receipt: ", receipthandle)
-                    print ("delete message status: ", dmsg)
                     registered=True
                 elif 'registration' in msg and msg['registration']=='FAIL':
                     fake_name = self.get_fake_name()
@@ -73,10 +69,8 @@ class Player(Roster, Fleet):
                         "arn": self.my_topic_arn['TopicArn']
                     }
 
-                    self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
                     dmsg = self.sqs_client.delete_message(QueueUrl=self.queue.url, ReceiptHandle=receipthandle)
-                    print ("delete message receipt: ", receipthandle)
-                    print ("delete message status: ", dmsg)
+                    self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
                 else:
                     print("Should not get here: ", msg)
                     # Do not delete as this message may be intended for GameServer ignore and move on

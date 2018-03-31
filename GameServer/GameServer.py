@@ -32,29 +32,18 @@ sns_client.subscribe(TopicArn=sns_arn, Protocol='sqs', Endpoint=sqs_arn)
 print ("GAME ON!!!!")
 def process_message(message):
     payload = json.loads(message)
+
     actions = {
         'register': register(payload),
     }
 
-    # Message formatted in comma delimited key/value pairs separated by semicolons
-    try:
-        actions[payload['action']]
-    except KeyError:
-        return
-
 def register(payload):
-    msg=json.loads(payload['Message'])
-    payload=json.loads(payload['Message'])
+    receipthandle=payload['ReceiptHandle']
+    msg=json.loads(payload['Body'])
+    payload=json.loads(msg['Message']) 
     message = {"registration": "FAIL", 'arn': payload['arn']}
-    print("register payload: ", payload)
     if 'handle' in payload and payload['handle'] not in game.playerRoster:
         game.playerRoster[payload['handle']]={'handle': payload['handle'], 'arn': payload['arn'], 'order': game.order}
-        try:
-            sub_ret = sns_client.subscribe(TopicArn=payload['arn'], Protocol='sqs', Endpoint=sqs_arn)
-        # Do not register if topic has been deleted
-        except:
-            print("Could not subscribe to endpoint: ", sub_ret)
-            return
 
         # message returned to caller
         message = {"registration": "SUCCESS",
@@ -66,10 +55,8 @@ def register(payload):
         game.order += 1
 
     try:
-        print("message: ", message)
         resp = sns_client.publish(TopicArn=payload['arn'], Message=json.dumps(message))
         print ("Roster: {}\n\n".format(game.playerRoster))
-        return
     except KeyError:
         print("payload: ", payload)
         print("register KeyError")
@@ -82,17 +69,17 @@ def register(payload):
         return
 
     # next, we delete the message from the queue so no one else will process it again
-    sqs_client.delete_message(QueueUrl=queue['QueueUrl'], ReceiptHandle=message['ReceiptHandle'])
+    ret = sqs_client.delete_message(QueueUrl=queue['QueueUrl'], ReceiptHandle=receipthandle)
 
     return
 
 count=1
 while True:
-    messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=1, WaitTimeSeconds=20)
+    messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=1, WaitTimeSeconds=20, VisibilityTimeout=30)
     print ("received message({}): {}".format(count, messages))
     count = count + 1
     if 'Messages' in messages: # when the queue is exhausted, the response dict contains no 'Messages' key
         for message in messages['Messages']: # 'Messages' is a list
             # process the messages
-            process_message(message['Body'])
+            process_message(json.dumps(message))
 

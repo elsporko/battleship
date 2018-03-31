@@ -15,9 +15,6 @@ class SQS_Policy(object):
       
         sqs_arn = self.sqs_client.get_queue_attributes(QueueUrl=self.queue.url, AttributeNames=['QueueArn'])['Attributes']['QueueArn']
 
-        # Subscribe to registration topic
-        self.sns_client.subscribe(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Protocol='sqs', Endpoint=sqs_arn)
-
         # Create topic for commuications to this bot and store it in the Player object. Topic name is a random string of 16 characters and letters
         self.my_topic_name = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(16)])
         self.my_topic_arn = self.sns_client.create_topic(Name=self.my_topic_name)

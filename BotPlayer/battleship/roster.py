@@ -18,8 +18,6 @@ class Roster(SQS_Policy):
             pr=self.playerRoster
             for handle in playerlist:
                 #TODO - make the publish try/catch in case 
-                #print("handle: ", handle)
-                #print("playerlist[handle]: ", playerlist[handle])
                 self.sns_client.publish(TopicArn=playerlist[handle]['arn'], Message=json.dumps(intro_message))
                 if handle not in self.playerRoster: # Avoid adding 'me' to the roster more than once
                     plist_arn = playerlist[handle]['arn']
@@ -29,6 +27,5 @@ class Roster(SQS_Policy):
                     })
                     pr[handle]=plist_record
 
-                    #self.playerRoster[playerlist[handle]]=plist_record
             self.playerRoster=pr
 

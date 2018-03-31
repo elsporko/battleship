@@ -6,16 +6,10 @@ from battleship.player import Player
 print("Creating instances...")
 print("Player...")
 player=Player()
-#print("Fleet...")
-#fleet=Fleet()
-#print("Move...")
-#move=Move()
 
 # Register
 print("Register player")
 player.register()
-#print("Load other players")
-#player.load_other_players()
 
 # Set up board
 print("Build fleet")
@@ -24,20 +18,15 @@ player.placeShips();
 
 # Main game loop
 while True:
-    print("Main loop")
     # Listen for messages
     payload = player.sqs_client.receive_message(QueueUrl=player.queue.url, MaxNumberOfMessages=1, WaitTimeSeconds=20)
-    print("Roster: ", player.playerRoster)
-    print("Fleet: ", player.nauticalMap)
     # Accept registration from other players
     # Main loop steps:
     #  * Turn change
     #  * Check if still alive
     #  * Check for registration and react as needed (Add to known players, ACK?)
     #  * Make move(s)
-    print ("should break")
     break
-    print ("nope")
 
 def process_message(message):
     payload = json.loads(message)
@@ -55,5 +44,4 @@ def process_message(message):
 print("Cleanup subscription")
 player.cleanup_subscription()
 
-# Concurrent process to add already existing applicants to our roster
 
