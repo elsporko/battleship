@@ -26,7 +26,7 @@ while True:
     #  * Check if still alive
     #  * Check for registration and react as needed (Add to known players, ACK?)
     #  * Make move(s)
-    break
+    #break
 
 def process_message(message):
     payload = json.loads(message)

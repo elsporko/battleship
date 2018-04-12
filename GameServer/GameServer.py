@@ -75,7 +75,7 @@ def register(payload):
 
 count=1
 while True:
-    messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=1, WaitTimeSeconds=20, VisibilityTimeout=30)
+    messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=1, WaitTimeSeconds=20, VisibilityTimeout=3)
     print ("received message({}): {}".format(count, messages))
     count = count + 1
     if 'Messages' in messages: # when the queue is exhausted, the response dict contains no 'Messages' key

@@ -3,16 +3,16 @@ import json
 import random
 import string
 from battleship.roster import Roster
-from battleship.fleet import Fleet
+from battleship.fleet import MyFleet
 
-class Player(Roster, Fleet):
+class Player(Roster, MyFleet):
     def __init__(self):
         # Max number of players is 20 as data is processed on 1 queue and the max number of policies tied to a queue is 20
         self.playerOrder = [None for x in range(20)] # Order of player turn
         self.orderIndex = 0
         self.fake_names = ['Hugh Mann', 'elsporko', 'Amanda Hugenkiz', 'Not A Bot', "Bender 'Bending' Rodriguez", 'Ann Onimus', 'Hugh Jass', 'Max Power']
         Roster.__init__(self)
-        Fleet.__init__(self)
+        MyFleet.__init__(self)
         
     def canMove(self):
         if self.playerOrder.length > move.getMoveSize():
@@ -30,14 +30,16 @@ class Player(Roster, Fleet):
         }
 
         print("Publish 1")
+        print("Message: ", message)
         self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
+        print("Published")
 
         registered = False
         empty_name_list = False # Have we run out of fake names?
 
         # Keep trying to register a unique handle
         while not registered and not empty_name_list:
-            payload = self.sqs_client.receive_message(QueueUrl=self.queue.url, MaxNumberOfMessages=1, WaitTimeSeconds=20, VisibilityTimeout=30)
+            payload = self.sqs_client.receive_message(QueueUrl=self.queue.url, MaxNumberOfMessages=10, WaitTimeSeconds=20, VisibilityTimeout=3)
 
             if 'Messages' not in payload:
                 continue
@@ -71,8 +73,8 @@ class Player(Roster, Fleet):
 
                     dmsg = self.sqs_client.delete_message(QueueUrl=self.queue.url, ReceiptHandle=receipthandle)
                     self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
-                else:
-                    print("Should not get here: ", msg)
+                #else:
+                    #print("Should not get here: ", msg)
                     # Do not delete as this message may be intended for GameServer ignore and move on
         print("roster: ", self.otherPlayers)
         return
@@ -88,16 +90,6 @@ class Player(Roster, Fleet):
         fake_name = self.fake_names[random.randint(0, len(self.fake_names)) - 1]
         self.fake_names.remove(fake_name)
         return fake_name
-
-    # Accept registration from other players
-    def acceptReg(self, handle, order):
-        self.playerOrder[order] = handle;
-        self.playerRoster[handle] = {
-            'pgrid': fleet.buildNauticalChart, # Build chart for other player
-            'order': int(msg['order']),
-            'arn': msg['arn']
-        }
-        print("accept reg: ", self.playerRoster)
 
     def myTurn(self):
         return (1,0)[self.currentPlayer() == self.me]
