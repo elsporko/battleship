@@ -19,7 +19,7 @@ player.placeShips();
 # Main game loop
 while True:
     # Listen for messages
-    payload = player.sqs_client.receive_message(QueueUrl=player.queue.url, MaxNumberOfMessages=1, WaitTimeSeconds=20)
+    payload = player.sqs_client.receive_message(QueueUrl=player.queue.url, MaxNumberOfMessages=10, WaitTimeSeconds=20)
     # Accept registration from other players
     # Main loop steps:
     #  * Turn change
@@ -31,7 +31,7 @@ while True:
 def process_message(message):
     payload = json.loads(message)
     actions = {
-        'playuerReg': player.acceptReg(payload),
+        'playerReg': player.acceptReg(payload),
         'processMoves': player.processMoves(payload)
     }
 

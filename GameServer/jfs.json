@@ -1,0 +1,14 @@
+{"Attributes": 
+	{"Policy": 
+		"{"Version":"2012-10-17",
+		  "Id":"arn:aws:sqs:us-east-2:849664249614:Topic_Queue/SQSDefaultPolicy",
+		  "Statement":[
+				{"Sid":"Test_Topic2SQS",
+				 "Effect":"Allow",
+				 "Principal":{"AWS":"*"},
+				 "Action":"SQS:SendMessage",
+				 "Resource":"arn:aws:sqs:us-east-2:849664249614:Test_Queue",
+				 "Condition":{"ArnEquals":{"aws:SourceArn":"arn:aws:sns:us-east-2:849664249614:Test_Topic"}}}]
+		}"
+	} 
+}

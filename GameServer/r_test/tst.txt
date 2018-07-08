@@ -1,0 +1,196 @@
+Creating queue Test_Queue
+Tie topic to queue
+Subscribing to topic
+Topic arn:  arn:aws:sns:us-east-2:849664249614:Test_Topic2
+sub arn:  arn:aws:sns:us-east-2:849664249614:Test_Topic2:b60280d5-6813-43d5-b9d8-82268c0922df
+Setting subscription filter
+filter:  {'ResponseMetadata': {'RequestId': 'c76581a5-dda2-5827-b1ed-d21d1ba2733e', 'HTTPHeaders': {'content-type': 'text/xml', 'x-amzn-requestid': 'c76581a5-dda2-5827-b1ed-d21d1ba2733e', 'content-length': '229', 'date': 'Fri, 06 Jul 2018 01:19:59 GMT'}, 'RetryAttempts': 0, 'HTTPStatusCode': 200}}
+~~~~~~~~~~~~~~~~~~~ BEGIN get_message ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+&& depth: 0 &&
+Retrieving Messages
+body:  {
+    "MessageAttributes": {
+        "topic_type": {
+            "Value": "Test_Topic2",
+            "Type": "String"
+        }
+    },
+    "Message": "{\"message\": \"Hello from the other side\"}",
+    "SignatureVersion": "1",
+    "MessageId": "0a471e2e-ec03-5008-ae45-4d99f3420e3b",
+    "UnsubscribeURL": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:849664249614:Test_Topic2:b60280d5-6813-43d5-b9d8-82268c0922df",
+    "Signature": "rj7Nvd7EV9vZzEOMkUfHjD+7dC8IV4VcmurvxvzblEoZgTs+i2MpSCGZogRFSS+6hhXikd7rEe4wQ57Y4dqNlRD8I1lQuoD4QJkglMaxXvpEZsYq2tKj9pA9bI1e3nU2q0jbuqVltxbb8Xd/cSLx8TZpttBiEctAO3tSxqZK33PjdWmUwjSmajSgBXnlIOmfKV64wJC8BqLVlk7RLvalCKtd3sIeeGaV6uqV0F0e8k2C1O4RO9Yu4eW1gXyRCd8bxj5c2k8WeGlhWn1Xh+XkWMMr3aYcs8klY6w/NNzk27J2tFvhIiZFVggi1okFnLL4qczVj+wSztwi4ECFnIbJsg==",
+    "Type": "Notification",
+    "TopicArn": "arn:aws:sns:us-east-2:849664249614:Test_Topic2",
+    "SigningCertURL": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem",
+    "Timestamp": "2018-07-04T19:16:17.803Z"
+}
+bmsg: {
+    "message": "Hello from the other side"
+}
+##################################################
+~~ Nothing to see here. Recurse! ~~
+body:  {
+    "MessageAttributes": {
+        "topic_type": {
+            "Value": "Test_Topic2",
+            "Type": "String"
+        }
+    },
+    "Message": "{\"message\": \"Hello from the other side\"}",
+    "SignatureVersion": "1",
+    "MessageId": "0a471e2e-ec03-5008-ae45-4d99f3420e3b",
+    "UnsubscribeURL": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:849664249614:Test_Topic2:b60280d5-6813-43d5-b9d8-82268c0922df",
+    "Signature": "rj7Nvd7EV9vZzEOMkUfHjD+7dC8IV4VcmurvxvzblEoZgTs+i2MpSCGZogRFSS+6hhXikd7rEe4wQ57Y4dqNlRD8I1lQuoD4QJkglMaxXvpEZsYq2tKj9pA9bI1e3nU2q0jbuqVltxbb8Xd/cSLx8TZpttBiEctAO3tSxqZK33PjdWmUwjSmajSgBXnlIOmfKV64wJC8BqLVlk7RLvalCKtd3sIeeGaV6uqV0F0e8k2C1O4RO9Yu4eW1gXyRCd8bxj5c2k8WeGlhWn1Xh+XkWMMr3aYcs8klY6w/NNzk27J2tFvhIiZFVggi1okFnLL4qczVj+wSztwi4ECFnIbJsg==",
+    "Type": "Notification",
+    "TopicArn": "arn:aws:sns:us-east-2:849664249614:Test_Topic2",
+    "SigningCertURL": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem",
+    "Timestamp": "2018-07-04T19:16:17.803Z"
+}
+Already processed  0a471e2e-ec03-5008-ae45-4d99f3420e3b
+body:  {
+    "MessageAttributes": {
+        "topic_type": {
+            "Value": "Test_Topic2",
+            "Type": "String"
+        }
+    },
+    "Message": "{\"message\": \"Hello from the other side\"}",
+    "SignatureVersion": "1",
+    "MessageId": "0a471e2e-ec03-5008-ae45-4d99f3420e3b",
+    "UnsubscribeURL": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:849664249614:Test_Topic2:b60280d5-6813-43d5-b9d8-82268c0922df",
+    "Signature": "rj7Nvd7EV9vZzEOMkUfHjD+7dC8IV4VcmurvxvzblEoZgTs+i2MpSCGZogRFSS+6hhXikd7rEe4wQ57Y4dqNlRD8I1lQuoD4QJkglMaxXvpEZsYq2tKj9pA9bI1e3nU2q0jbuqVltxbb8Xd/cSLx8TZpttBiEctAO3tSxqZK33PjdWmUwjSmajSgBXnlIOmfKV64wJC8BqLVlk7RLvalCKtd3sIeeGaV6uqV0F0e8k2C1O4RO9Yu4eW1gXyRCd8bxj5c2k8WeGlhWn1Xh+XkWMMr3aYcs8klY6w/NNzk27J2tFvhIiZFVggi1okFnLL4qczVj+wSztwi4ECFnIbJsg==",
+    "Type": "Notification",
+    "TopicArn": "arn:aws:sns:us-east-2:849664249614:Test_Topic2",
+    "SigningCertURL": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem",
+    "Timestamp": "2018-07-04T19:16:17.803Z"
+}
+Already processed  0a471e2e-ec03-5008-ae45-4d99f3420e3b
+body:  {
+    "MessageAttributes": {
+        "topic_type": {
+            "Value": "Test_Topic2",
+            "Type": "String"
+        }
+    },
+    "Message": "{\"message\": \"Hello from the other side\"}",
+    "SignatureVersion": "1",
+    "MessageId": "0a471e2e-ec03-5008-ae45-4d99f3420e3b",
+    "UnsubscribeURL": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:849664249614:Test_Topic2:b60280d5-6813-43d5-b9d8-82268c0922df",
+    "Signature": "rj7Nvd7EV9vZzEOMkUfHjD+7dC8IV4VcmurvxvzblEoZgTs+i2MpSCGZogRFSS+6hhXikd7rEe4wQ57Y4dqNlRD8I1lQuoD4QJkglMaxXvpEZsYq2tKj9pA9bI1e3nU2q0jbuqVltxbb8Xd/cSLx8TZpttBiEctAO3tSxqZK33PjdWmUwjSmajSgBXnlIOmfKV64wJC8BqLVlk7RLvalCKtd3sIeeGaV6uqV0F0e8k2C1O4RO9Yu4eW1gXyRCd8bxj5c2k8WeGlhWn1Xh+XkWMMr3aYcs8klY6w/NNzk27J2tFvhIiZFVggi1okFnLL4qczVj+wSztwi4ECFnIbJsg==",
+    "Type": "Notification",
+    "TopicArn": "arn:aws:sns:us-east-2:849664249614:Test_Topic2",
+    "SigningCertURL": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem",
+    "Timestamp": "2018-07-04T19:16:17.803Z"
+}
+Already processed  0a471e2e-ec03-5008-ae45-4d99f3420e3b
+body:  {
+    "MessageAttributes": {
+        "topic_type": {
+            "Value": "Test_Topic2",
+            "Type": "String"
+        }
+    },
+    "Message": "{\"message\": \"Hello from the other side\"}",
+    "SignatureVersion": "1",
+    "MessageId": "0a471e2e-ec03-5008-ae45-4d99f3420e3b",
+    "UnsubscribeURL": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:849664249614:Test_Topic2:b60280d5-6813-43d5-b9d8-82268c0922df",
+    "Signature": "rj7Nvd7EV9vZzEOMkUfHjD+7dC8IV4VcmurvxvzblEoZgTs+i2MpSCGZogRFSS+6hhXikd7rEe4wQ57Y4dqNlRD8I1lQuoD4QJkglMaxXvpEZsYq2tKj9pA9bI1e3nU2q0jbuqVltxbb8Xd/cSLx8TZpttBiEctAO3tSxqZK33PjdWmUwjSmajSgBXnlIOmfKV64wJC8BqLVlk7RLvalCKtd3sIeeGaV6uqV0F0e8k2C1O4RO9Yu4eW1gXyRCd8bxj5c2k8WeGlhWn1Xh+XkWMMr3aYcs8klY6w/NNzk27J2tFvhIiZFVggi1okFnLL4qczVj+wSztwi4ECFnIbJsg==",
+    "Type": "Notification",
+    "TopicArn": "arn:aws:sns:us-east-2:849664249614:Test_Topic2",
+    "SigningCertURL": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem",
+    "Timestamp": "2018-07-04T19:16:17.803Z"
+}
+Already processed  0a471e2e-ec03-5008-ae45-4d99f3420e3b
+body:  {
+    "MessageAttributes": {
+        "topic_type": {
+            "Value": "Test_Topic2",
+            "Type": "String"
+        }
+    },
+    "Message": "{\"message\": \"Hello from the other side\"}",
+    "SignatureVersion": "1",
+    "MessageId": "0a471e2e-ec03-5008-ae45-4d99f3420e3b",
+    "UnsubscribeURL": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:849664249614:Test_Topic2:b60280d5-6813-43d5-b9d8-82268c0922df",
+    "Signature": "rj7Nvd7EV9vZzEOMkUfHjD+7dC8IV4VcmurvxvzblEoZgTs+i2MpSCGZogRFSS+6hhXikd7rEe4wQ57Y4dqNlRD8I1lQuoD4QJkglMaxXvpEZsYq2tKj9pA9bI1e3nU2q0jbuqVltxbb8Xd/cSLx8TZpttBiEctAO3tSxqZK33PjdWmUwjSmajSgBXnlIOmfKV64wJC8BqLVlk7RLvalCKtd3sIeeGaV6uqV0F0e8k2C1O4RO9Yu4eW1gXyRCd8bxj5c2k8WeGlhWn1Xh+XkWMMr3aYcs8klY6w/NNzk27J2tFvhIiZFVggi1okFnLL4qczVj+wSztwi4ECFnIbJsg==",
+    "Type": "Notification",
+    "TopicArn": "arn:aws:sns:us-east-2:849664249614:Test_Topic2",
+    "SigningCertURL": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem",
+    "Timestamp": "2018-07-04T19:16:17.803Z"
+}
+Already processed  0a471e2e-ec03-5008-ae45-4d99f3420e3b
+body:  {
+    "MessageAttributes": {
+        "topic_type": {
+            "Value": "Test_Topic2",
+            "Type": "String"
+        }
+    },
+    "Message": "{\"message\": \"Hello from the other side\"}",
+    "SignatureVersion": "1",
+    "MessageId": "0a471e2e-ec03-5008-ae45-4d99f3420e3b",
+    "UnsubscribeURL": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:849664249614:Test_Topic2:b60280d5-6813-43d5-b9d8-82268c0922df",
+    "Signature": "rj7Nvd7EV9vZzEOMkUfHjD+7dC8IV4VcmurvxvzblEoZgTs+i2MpSCGZogRFSS+6hhXikd7rEe4wQ57Y4dqNlRD8I1lQuoD4QJkglMaxXvpEZsYq2tKj9pA9bI1e3nU2q0jbuqVltxbb8Xd/cSLx8TZpttBiEctAO3tSxqZK33PjdWmUwjSmajSgBXnlIOmfKV64wJC8BqLVlk7RLvalCKtd3sIeeGaV6uqV0F0e8k2C1O4RO9Yu4eW1gXyRCd8bxj5c2k8WeGlhWn1Xh+XkWMMr3aYcs8klY6w/NNzk27J2tFvhIiZFVggi1okFnLL4qczVj+wSztwi4ECFnIbJsg==",
+    "Type": "Notification",
+    "TopicArn": "arn:aws:sns:us-east-2:849664249614:Test_Topic2",
+    "SigningCertURL": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem",
+    "Timestamp": "2018-07-04T19:16:17.803Z"
+}
+Already processed  0a471e2e-ec03-5008-ae45-4d99f3420e3b
+body:  {
+    "MessageAttributes": {
+        "topic_type": {
+            "Value": "Test_Topic2",
+            "Type": "String"
+        }
+    },
+    "Message": "{\"message\": \"Hello from the other side\"}",
+    "SignatureVersion": "1",
+    "MessageId": "0a471e2e-ec03-5008-ae45-4d99f3420e3b",
+    "UnsubscribeURL": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:849664249614:Test_Topic2:b60280d5-6813-43d5-b9d8-82268c0922df",
+    "Signature": "rj7Nvd7EV9vZzEOMkUfHjD+7dC8IV4VcmurvxvzblEoZgTs+i2MpSCGZogRFSS+6hhXikd7rEe4wQ57Y4dqNlRD8I1lQuoD4QJkglMaxXvpEZsYq2tKj9pA9bI1e3nU2q0jbuqVltxbb8Xd/cSLx8TZpttBiEctAO3tSxqZK33PjdWmUwjSmajSgBXnlIOmfKV64wJC8BqLVlk7RLvalCKtd3sIeeGaV6uqV0F0e8k2C1O4RO9Yu4eW1gXyRCd8bxj5c2k8WeGlhWn1Xh+XkWMMr3aYcs8klY6w/NNzk27J2tFvhIiZFVggi1okFnLL4qczVj+wSztwi4ECFnIbJsg==",
+    "Type": "Notification",
+    "TopicArn": "arn:aws:sns:us-east-2:849664249614:Test_Topic2",
+    "SigningCertURL": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem",
+    "Timestamp": "2018-07-04T19:16:17.803Z"
+}
+Already processed  0a471e2e-ec03-5008-ae45-4d99f3420e3b
+body:  {
+    "MessageAttributes": {
+        "topic_type": {
+            "Value": "Test_Topic2",
+            "Type": "String"
+        }
+    },
+    "Message": "{\"message\": \"Hello from the other side\"}",
+    "SignatureVersion": "1",
+    "MessageId": "0a471e2e-ec03-5008-ae45-4d99f3420e3b",
+    "UnsubscribeURL": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:849664249614:Test_Topic2:b60280d5-6813-43d5-b9d8-82268c0922df",
+    "Signature": "rj7Nvd7EV9vZzEOMkUfHjD+7dC8IV4VcmurvxvzblEoZgTs+i2MpSCGZogRFSS+6hhXikd7rEe4wQ57Y4dqNlRD8I1lQuoD4QJkglMaxXvpEZsYq2tKj9pA9bI1e3nU2q0jbuqVltxbb8Xd/cSLx8TZpttBiEctAO3tSxqZK33PjdWmUwjSmajSgBXnlIOmfKV64wJC8BqLVlk7RLvalCKtd3sIeeGaV6uqV0F0e8k2C1O4RO9Yu4eW1gXyRCd8bxj5c2k8WeGlhWn1Xh+XkWMMr3aYcs8klY6w/NNzk27J2tFvhIiZFVggi1okFnLL4qczVj+wSztwi4ECFnIbJsg==",
+    "Type": "Notification",
+    "TopicArn": "arn:aws:sns:us-east-2:849664249614:Test_Topic2",
+    "SigningCertURL": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem",
+    "Timestamp": "2018-07-04T19:16:17.803Z"
+}
+Already processed  0a471e2e-ec03-5008-ae45-4d99f3420e3b
+body:  {
+    "MessageAttributes": {
+        "topic_type": {
+            "Value": "Test_Topic2",
+            "Type": "String"
+        }
+    },
+    "Message": "{\"message\": \"Hello from the other side\"}",
+    "SignatureVersion": "1",
+    "MessageId": "0a471e2e-ec03-5008-ae45-4d99f3420e3b",
+    "UnsubscribeURL": "https://sns.us-east-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-2:849664249614:Test_Topic2:b60280d5-6813-43d5-b9d8-82268c0922df",
+    "Signature": "rj7Nvd7EV9vZzEOMkUfHjD+7dC8IV4VcmurvxvzblEoZgTs+i2MpSCGZogRFSS+6hhXikd7rEe4wQ57Y4dqNlRD8I1lQuoD4QJkglMaxXvpEZsYq2tKj9pA9bI1e3nU2q0jbuqVltxbb8Xd/cSLx8TZpttBiEctAO3tSxqZK33PjdWmUwjSmajSgBXnlIOmfKV64wJC8BqLVlk7RLvalCKtd3sIeeGaV6uqV0F0e8k2C1O4RO9Yu4eW1gXyRCd8bxj5c2k8WeGlhWn1Xh+XkWMMr3aYcs8klY6w/NNzk27J2tFvhIiZFVggi1okFnLL4qczVj+wSztwi4ECFnIbJsg==",
+    "Type": "Notification",
+    "TopicArn": "arn:aws:sns:us-east-2:849664249614:Test_Topic2",
+    "SigningCertURL": "https://sns.us-east-2.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem",
+    "Timestamp": "2018-07-04T19:16:17.803Z"
+}
+Already processed  0a471e2e-ec03-5008-ae45-4d99f3420e3b
+~~~~~~~~~~~~~~~~~~~ END get_message ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+msg:  null

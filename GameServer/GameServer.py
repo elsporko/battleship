@@ -3,6 +3,7 @@ import json
 import sys
 from game.game import Game
 from game.sqs_policy import SQS_Policy
+from time import gmtime, strftime
 
 game=Game()
 
@@ -22,7 +23,7 @@ sqs_policy = SQS_Policy()
 
 print ("Tie topic to queue")
 # Tie queue with topic
-policy = sqs_policy.get_policy('BR_Topic', 'Battleship_Registration', queue['QueueUrl'])
+policy = sqs_policy.build_policy('BR_Topic', 'Battleship_Registration', queue['QueueUrl'])
 sqs_client.set_queue_attributes(QueueUrl=queue['QueueUrl'], Attributes={'Policy': policy})
 
 print ("Subscribing to topic")
@@ -30,6 +31,7 @@ print ("Subscribing to topic")
 sns_client.subscribe(TopicArn=sns_arn, Protocol='sqs', Endpoint=sqs_arn)
 
 print ("GAME ON!!!!")
+
 def process_message(message):
     payload = json.loads(message)
 
@@ -38,9 +40,14 @@ def process_message(message):
     }
 
 def register(payload):
+    # TODO - Fix this ugliness
     receipthandle=payload['ReceiptHandle']
     msg=json.loads(payload['Body'])
     payload=json.loads(msg['Message']) 
+
+    if 'handle' not in payload:
+        return
+
     message = {"registration": "FAIL", 'arn': payload['arn']}
     if 'handle' in payload and payload['handle'] not in game.playerRoster:
         game.playerRoster[payload['handle']]={'handle': payload['handle'], 'arn': payload['arn'], 'order': game.order}
@@ -54,11 +61,15 @@ def register(payload):
                   }
         game.order += 1
 
+        # Tie topic arn to the queue
+
     try:
+        print("Attempting to publish: ", message)
+        print("Publishing to arn: ", payload['arn'])
         resp = sns_client.publish(TopicArn=payload['arn'], Message=json.dumps(message))
-        print ("Roster: {}\n\n".format(game.playerRoster))
+        #print ("GameServer: {} - Roster: {}\n\n".format(game.playerRoster, strftime("%a, %d %b %Y %X +0000", gmtime())))
     except KeyError:
-        print("payload: ", payload)
+        #print("GameServer: {} - payload: ".format(payload,strftime("%a, %d %b %Y %X +0000", gmtime())))
         print("register KeyError")
         return
     except TypeError:
@@ -70,13 +81,14 @@ def register(payload):
 
     # next, we delete the message from the queue so no one else will process it again
     ret = sqs_client.delete_message(QueueUrl=queue['QueueUrl'], ReceiptHandle=receipthandle)
+    print ("Delete message: ", ret)
 
     return
 
 count=1
 while True:
-    messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=1, WaitTimeSeconds=20, VisibilityTimeout=3)
-    print ("received message({}): {}".format(count, messages))
+    messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=10, WaitTimeSeconds=20, VisibilityTimeout=0)
+    #print ("GameServer: {} - received message({}): {}".format(count, messages,strftime("%a, %d %b %Y %X +0000", gmtime())))
     count = count + 1
     if 'Messages' in messages: # when the queue is exhausted, the response dict contains no 'Messages' key
         for message in messages['Messages']: # 'Messages' is a list
