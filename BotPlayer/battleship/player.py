@@ -4,6 +4,7 @@ import random
 import string
 from battleship.roster import Roster
 from battleship.fleet import MyFleet
+from time import gmtime, strftime
 
 class Player(Roster, MyFleet):
     def __init__(self):
@@ -29,18 +30,22 @@ class Player(Roster, MyFleet):
             "arn": self.my_topic_arn['TopicArn']
         }
 
-        print("Publish 1")
-        print("Message: ", message)
-        self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
-        print("Published")
+        # Initial attempt at registration
+        #self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
+        self.send_message(message, ['arn:aws:sns:us-east-2:849664249614:BR_Topic'])
 
+        # Set up flags for registration loop
         registered = False
         empty_name_list = False # Have we run out of fake names?
 
         # Keep trying to register a unique handle
         while not registered and not empty_name_list:
-            payload = self.sqs_client.receive_message(QueueUrl=self.queue.url, MaxNumberOfMessages=10, WaitTimeSeconds=20, VisibilityTimeout=3)
+            #payload = self.sqs_client.receive_message(QueueUrl=self.queue.url, MaxNumberOfMessages=10, WaitTimeSeconds=20, VisibilityTimeout=0)
+            payload = self.get_message()
+            #print("Player: {} - payload: {}".format(strftime("%a, %d %b %Y %X +0000", gmtime()), payload))
 
+            if not payload:
+                continue
             if 'Messages' not in payload:
                 continue
             for msg in payload['Messages']:
@@ -58,7 +63,10 @@ class Player(Roster, MyFleet):
                     self.me={'handle': fake_name, 'arn': self.my_topic_arn['TopicArn']}
                     self.playerOrder[int(msg['order'])]=msg['handle']
                     self.otherPlayers=self.load_other_players(msg['registered_players'])
+                    print ("playerRoster: ", self.playerRoster)
                     dmsg = self.sqs_client.delete_message(QueueUrl=self.queue.url, ReceiptHandle=receipthandle)
+                    print("{} registered".format(fake_name))
+                    #print("1--roster: ", self.otherPlayers)
                     registered=True
                 elif 'registration' in msg and msg['registration']=='FAIL':
                     fake_name = self.get_fake_name()
@@ -72,11 +80,13 @@ class Player(Roster, MyFleet):
                     }
 
                     dmsg = self.sqs_client.delete_message(QueueUrl=self.queue.url, ReceiptHandle=receipthandle)
-                    self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
+                    #self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
+                    player.send_message(message, ['arn:aws:sns:us-east-2:849664249614:BR_Topic'])
                 #else:
                     #print("Should not get here: ", msg)
                     # Do not delete as this message may be intended for GameServer ignore and move on
-        print("roster: ", self.otherPlayers)
+        print("Player: {} - Roster: {}\n\n".format(self.playerRoster, strftime("%a, %d %b %Y %X +0000", gmtime())))
+        #print("roster: ", self.otherPlayers)
         return
 
     def cleanup_subscription(self):

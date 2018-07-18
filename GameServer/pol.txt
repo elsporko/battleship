@@ -1,0 +1,50 @@
+Creating queue Test_Queue
+Creating topic Test_Topic2
+Tie topic to queue
+policy:  {
+    "ResponseMetadata": {
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "server": "Server",
+            "x-amzn-requestid": "69f82bf7-5b82-5637-aa20-786ad1427c14",
+            "content-length": "252",
+            "content-type": "text/xml",
+            "date": "Fri, 15 Jun 2018 09:36:00 GMT",
+            "connection": "keep-alive"
+        },
+        "RequestId": "69f82bf7-5b82-5637-aa20-786ad1427c14",
+        "RetryAttempts": 0
+    }
+}
+Just created policy:  {
+    "Statement": [
+        {
+            "Sid": "Test_Topic22SQS",
+            "Effect": "Allow",
+            "Resource": "arn:aws:sqs:us-east-2:849664249614:Test_Queue",
+            "Principal": {
+                "AWS": "*"
+            },
+            "Action": "SQS:SendMessage",
+            "Condition": {
+                "ArnEquals": {
+                    "aws:SourceArn": "arn:aws:sns:us-east-2:849664249614:Test_Topic2"
+                }
+            }
+        }
+    ],
+    "ResponseMetadata": {
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "server": "Server",
+            "x-amzn-requestid": "69f82bf7-5b82-5637-aa20-786ad1427c14",
+            "content-length": "252",
+            "content-type": "text/xml",
+            "date": "Fri, 15 Jun 2018 09:36:00 GMT",
+            "connection": "keep-alive"
+        },
+        "RequestId": "69f82bf7-5b82-5637-aa20-786ad1427c14",
+        "RetryAttempts": 0
+    }
+}
+Creating queue Test_Queue

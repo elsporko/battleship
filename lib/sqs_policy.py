@@ -2,6 +2,7 @@ import boto3
 import json
 import random
 import string
+import time
 
 class SQS_Policy(object):
     def __init__(self, queue_name='Battleship_Registration'):
@@ -76,4 +77,44 @@ class SQS_Policy(object):
     
         # Return policy as a string
         return (json.dumps(policy))
+
+    def get_message(self, topic_filter=None, msg_ids=dict()):
+        topic_filter = topic_filter or self.my_topic_name
+        print ("Retrieving Messages")
+        messages = self.sqs_client.receive_message(QueueUrl=self.queue.url,MaxNumberOfMessages=10, WaitTimeSeconds=2, VisibilityTimeout=10)
     
+        if 'Messages' in messages:
+            #print ("messages: ", json.dumps(messages, indent=4))
+            for message in messages['Messages']:
+                body = json.loads(message['Body'])
+                if body['MessageId'] not in msg_ids:
+                    bmsg = json.loads(body['Message'])
+                    #print ("body: ", json.dumps(body, indent=4))
+                    a = body['MessageAttributes']
+                    continue
+                try:
+                    topic_filter in a['topic_type']['Value'] 
+    
+                except KeyError:
+                    #time.sleep(5)
+                    return self.get_message(topic_filter, msg_ids)
+    
+                if a['topic_type']['Value'] == topic_filter:
+                    return(bmsg)
+    
+                #msg_ids[body['MessageId']]=bmsg['message']
+                msg_ids[body['MessageId']]=body['MessageId']
+                #time.sleep(5)
+                return self.get_message(topic_filter, msg_ids)
+
+    """ Send message to destination(s) """
+    def send_message(self, message, destination):
+        resp = ''
+        try:
+            for d in destination:
+                print ("d: ", d)
+                resp = self.sns_client.publish(TopicArn=d, Message=json.dumps(message), MessageAttributes={'topic_type':{'DataType': 'String','StringValue': d}})
+                print("Response: ", resp)
+        except:
+            print("Could not publish message: ", message)
+            print("Reason: ", resp)

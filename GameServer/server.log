@@ -1,0 +1,73 @@
+Creating topic BR_Topic
+Creating queue Battleship_Registration
+Tie topic to queue
+Subscribing to topic
+GAME ON!!!!
+1
+2
+3
+Attempting to publish:  {'arn': 'arn:aws:sns:us-east-2:849664249614:wLymlLaay49OU9mz', 'registration': 'SUCCESS', 'order': 0, 'registered_players': {'elsporko': {'arn': 'arn:aws:sns:us-east-2:849664249614:wLymlLaay49OU9mz', 'handle': 'elsporko', 'order': 0}}, 'handle': 'elsporko'}
+Delete message:  {'ResponseMetadata': {'RequestId': '44aa396c-e27d-54f3-b486-6afe76421a53', 'HTTPStatusCode': 200, 'HTTPHeaders': {'connection': 'keep-alive', 'x-amzn-requestid': '44aa396c-e27d-54f3-b486-6afe76421a53', 'date': 'Thu, 07 Jun 2018 02:01:35 GMT', 'content-type': 'text/xml', 'server': 'Server', 'content-length': '215'}, 'RetryAttempts': 0}}
+4
+3
+Attempting to publish:  {'arn': 'arn:aws:sns:us-east-2:849664249614:wLymlLaay49OU9mz', 'registration': 'FAIL'}
+Delete message:  {'ResponseMetadata': {'RequestId': '7ed67098-782e-5d39-b5c3-230aec119399', 'HTTPStatusCode': 200, 'HTTPHeaders': {'connection': 'keep-alive', 'x-amzn-requestid': '7ed67098-782e-5d39-b5c3-230aec119399', 'date': 'Thu, 07 Jun 2018 02:01:35 GMT', 'content-type': 'text/xml', 'server': 'Server', 'content-length': '215'}, 'RetryAttempts': 0}}
+4
+1
+2
+3
+Attempting to publish:  {'arn': 'arn:aws:sns:us-east-2:849664249614:hdp8dYJmAgNbCCFD', 'registration': 'FAIL'}
+Delete message:  {'ResponseMetadata': {'RequestId': 'ec51900d-aa4e-58a8-94f8-c39f3e1fa608', 'HTTPStatusCode': 200, 'HTTPHeaders': {'connection': 'keep-alive', 'x-amzn-requestid': 'ec51900d-aa4e-58a8-94f8-c39f3e1fa608', 'date': 'Thu, 07 Jun 2018 02:01:53 GMT', 'content-type': 'text/xml', 'server': 'Server', 'content-length': '215'}, 'RetryAttempts': 0}}
+4
+3
+Attempting to publish:  {'arn': 'arn:aws:sns:us-east-2:849664249614:hdp8dYJmAgNbCCFD', 'registration': 'FAIL'}
+Delete message:  {'ResponseMetadata': {'RequestId': 'baae862f-07ae-5398-9467-d5bd93fcad38', 'HTTPStatusCode': 200, 'HTTPHeaders': {'connection': 'keep-alive', 'x-amzn-requestid': 'baae862f-07ae-5398-9467-d5bd93fcad38', 'date': 'Thu, 07 Jun 2018 02:01:54 GMT', 'content-type': 'text/xml', 'server': 'Server', 'content-length': '215'}, 'RetryAttempts': 0}}
+4
+1
+2
+3
+Attempting to publish:  {'arn': 'arn:aws:sns:us-east-2:849664249614:hdp8dYJmAgNbCCFD', 'registration': 'SUCCESS', 'order': 1, 'registered_players': {"Bender 'Bending' Rodriguez": {'arn': 'arn:aws:sns:us-east-2:849664249614:hdp8dYJmAgNbCCFD', 'handle': "Bender 'Bending' Rodriguez", 'order': 1}, 'elsporko': {'arn': 'arn:aws:sns:us-east-2:849664249614:wLymlLaay49OU9mz', 'handle': 'elsporko', 'order': 0}}, 'handle': "Bender 'Bending' Rodriguez"}
+Delete message:  {'ResponseMetadata': {'RequestId': '702fa656-6792-5f3b-a2db-f5c4f3c0319b', 'HTTPStatusCode': 200, 'HTTPHeaders': {'connection': 'keep-alive', 'x-amzn-requestid': '702fa656-6792-5f3b-a2db-f5c4f3c0319b', 'date': 'Thu, 07 Jun 2018 02:01:54 GMT', 'content-type': 'text/xml', 'server': 'Server', 'content-length': '215'}, 'RetryAttempts': 0}}
+4
+3
+Attempting to publish:  {'arn': 'arn:aws:sns:us-east-2:849664249614:hdp8dYJmAgNbCCFD', 'registration': 'FAIL'}
+Delete message:  {'ResponseMetadata': {'RequestId': '5ffef775-e56d-5571-9455-a4e7713fdbd1', 'HTTPStatusCode': 200, 'HTTPHeaders': {'connection': 'keep-alive', 'x-amzn-requestid': '5ffef775-e56d-5571-9455-a4e7713fdbd1', 'date': 'Thu, 07 Jun 2018 02:01:54 GMT', 'content-type': 'text/xml', 'server': 'Server', 'content-length': '215'}, 'RetryAttempts': 0}}
+4
+1
+2
+3
+Attempting to publish:  {'arn': 'arn:aws:sns:us-east-2:849664249614:hdp8dYJmAgNbCCFD', 'registration': 'SUCCESS', 'order': 2, 'registered_players': {"Bender 'Bending' Rodriguez": {'arn': 'arn:aws:sns:us-east-2:849664249614:hdp8dYJmAgNbCCFD', 'handle': "Bender 'Bending' Rodriguez", 'order': 1}, 'Max Power': {'arn': 'arn:aws:sns:us-east-2:849664249614:hdp8dYJmAgNbCCFD', 'handle': 'Max Power', 'order': 2}, 'elsporko': {'arn': 'arn:aws:sns:us-east-2:849664249614:wLymlLaay49OU9mz', 'handle': 'elsporko', 'order': 0}}, 'handle': 'Max Power'}
+Delete message:  {'ResponseMetadata': {'RequestId': '3af2525f-0938-5301-b213-01cd9d6abda1', 'HTTPStatusCode': 200, 'HTTPHeaders': {'connection': 'keep-alive', 'x-amzn-requestid': '3af2525f-0938-5301-b213-01cd9d6abda1', 'date': 'Thu, 07 Jun 2018 02:01:54 GMT', 'content-type': 'text/xml', 'server': 'Server', 'content-length': '215'}, 'RetryAttempts': 0}}
+4
+1
+2
+3
+Attempting to publish:  {'arn': 'arn:aws:sns:us-east-2:849664249614:hdp8dYJmAgNbCCFD', 'registration': 'FAIL'}
+Delete message:  {'ResponseMetadata': {'RequestId': '34bc264d-215d-5d69-a87a-75dfb50f63c9', 'HTTPStatusCode': 200, 'HTTPHeaders': {'connection': 'keep-alive', 'x-amzn-requestid': '34bc264d-215d-5d69-a87a-75dfb50f63c9', 'date': 'Thu, 07 Jun 2018 02:01:54 GMT', 'content-type': 'text/xml', 'server': 'Server', 'content-length': '215'}, 'RetryAttempts': 0}}
+4
+1
+2
+3
+Attempting to publish:  {'arn': 'arn:aws:sns:us-east-2:849664249614:Oe5jGqZC2DHJJFD7', 'registration': 'FAIL'}
+Delete message:  {'ResponseMetadata': {'RequestId': '990bfec2-b72a-5cdc-8cab-ad50234b527c', 'HTTPStatusCode': 200, 'HTTPHeaders': {'connection': 'keep-alive', 'x-amzn-requestid': '990bfec2-b72a-5cdc-8cab-ad50234b527c', 'date': 'Thu, 07 Jun 2018 02:02:09 GMT', 'content-type': 'text/xml', 'server': 'Server', 'content-length': '215'}, 'RetryAttempts': 0}}
+4
+1
+2
+3
+Attempting to publish:  {'arn': 'arn:aws:sns:us-east-2:849664249614:hdp8dYJmAgNbCCFD', 'registration': 'FAIL'}
+Delete message:  {'ResponseMetadata': {'RequestId': '704ea826-891a-5b6b-b5ca-fbb41d6a35cb', 'HTTPStatusCode': 200, 'HTTPHeaders': {'connection': 'keep-alive', 'x-amzn-requestid': '704ea826-891a-5b6b-b5ca-fbb41d6a35cb', 'date': 'Thu, 07 Jun 2018 02:02:24 GMT', 'content-type': 'text/xml', 'server': 'Server', 'content-length': '215'}, 'RetryAttempts': 0}}
+4
+3
+Attempting to publish:  {'arn': 'arn:aws:sns:us-east-2:849664249614:hdp8dYJmAgNbCCFD', 'registration': 'FAIL'}
+Delete message:  {'ResponseMetadata': {'RequestId': '663b07cd-55ce-5106-800f-545fc1bf7fa6', 'HTTPStatusCode': 200, 'HTTPHeaders': {'connection': 'keep-alive', 'x-amzn-requestid': '663b07cd-55ce-5106-800f-545fc1bf7fa6', 'date': 'Thu, 07 Jun 2018 02:02:25 GMT', 'content-type': 'text/xml', 'server': 'Server', 'content-length': '215'}, 'RetryAttempts': 0}}
+4
+3
+Attempting to publish:  {'arn': 'arn:aws:sns:us-east-2:849664249614:hdp8dYJmAgNbCCFD', 'registration': 'FAIL'}
+Delete message:  {'ResponseMetadata': {'RequestId': 'a6102c63-e394-5ea6-b542-7ff177e5e006', 'HTTPStatusCode': 200, 'HTTPHeaders': {'connection': 'keep-alive', 'x-amzn-requestid': 'a6102c63-e394-5ea6-b542-7ff177e5e006', 'date': 'Thu, 07 Jun 2018 02:02:25 GMT', 'content-type': 'text/xml', 'server': 'Server', 'content-length': '215'}, 'RetryAttempts': 0}}
+4
+1
+2
+3
+Attempting to publish:  {'arn': 'arn:aws:sns:us-east-2:849664249614:hdp8dYJmAgNbCCFD', 'registration': 'FAIL'}
+Delete message:  {'ResponseMetadata': {'RequestId': 'a9d8cbb0-a0fd-534e-b43d-9822348cddee', 'HTTPStatusCode': 200, 'HTTPHeaders': {'connection': 'keep-alive', 'x-amzn-requestid': 'a9d8cbb0-a0fd-534e-b43d-9822348cddee', 'date': 'Thu, 07 Jun 2018 02:02:25 GMT', 'content-type': 'text/xml', 'server': 'Server', 'content-length': '215'}, 'RetryAttempts': 0}}
+4
