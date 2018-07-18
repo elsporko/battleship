@@ -1,6 +1,8 @@
 import threading
 import json
-from battleship.sqs_policy import SQS_Policy
+import sys
+sys.path.append('..')
+from lib.sqs_policy import SQS_Policy
 from battleship.fleet import Fleet
 
 class Roster(SQS_Policy):
@@ -53,4 +55,3 @@ class Roster(SQS_Policy):
             pr[handle]=plist_record
 
         print("accept reg: ", self.playerRoster)
-

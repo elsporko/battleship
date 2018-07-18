@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 from battleship.fleet  import Fleet
 from battleship.player import Player
 #from battleship.move   import Move
@@ -19,7 +20,8 @@ player.placeShips();
 # Main game loop
 while True:
     # Listen for messages
-    payload = player.sqs_client.receive_message(QueueUrl=player.queue.url, MaxNumberOfMessages=10, WaitTimeSeconds=20)
+    #payload = player.sqs_client.receive_message(QueueUrl=player.queue.url, MaxNumberOfMessages=10, WaitTimeSeconds=20)
+    payload = player.get_message()
     # Accept registration from other players
     # Main loop steps:
     #  * Turn change

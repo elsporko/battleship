@@ -2,7 +2,9 @@ import boto3
 import json
 import sys
 from game.game import Game
-from game.sqs_policy import SQS_Policy
+sys.path.append('..')
+from lib.sqs_policy import SQS_Policy
+#from game.sqs_policy import SQS_Policy
 from time import gmtime, strftime
 
 game=Game()
@@ -66,7 +68,8 @@ def register(payload):
     try:
         print("Attempting to publish: ", message)
         print("Publishing to arn: ", payload['arn'])
-        resp = sns_client.publish(TopicArn=payload['arn'], Message=json.dumps(message))
+        #resp = sns_client.publish(TopicArn=payload['arn'], Message=json.dumps(message))
+        self.send_message(message, [payload['arn']])
         #print ("GameServer: {} - Roster: {}\n\n".format(game.playerRoster, strftime("%a, %d %b %Y %X +0000", gmtime())))
     except KeyError:
         #print("GameServer: {} - payload: ".format(payload,strftime("%a, %d %b %Y %X +0000", gmtime())))
@@ -87,9 +90,13 @@ def register(payload):
 
 count=1
 while True:
-    messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=10, WaitTimeSeconds=20, VisibilityTimeout=0)
+    #messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=10, WaitTimeSeconds=20, VisibilityTimeout=0)
+    messages = sqs_policy.get_message()
     #print ("GameServer: {} - received message({}): {}".format(count, messages,strftime("%a, %d %b %Y %X +0000", gmtime())))
     count = count + 1
+    if  not messages:
+        continue
+
     if 'Messages' in messages: # when the queue is exhausted, the response dict contains no 'Messages' key
         for message in messages['Messages']: # 'Messages' is a list
             # process the messages

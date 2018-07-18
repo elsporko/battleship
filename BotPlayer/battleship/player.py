@@ -31,7 +31,8 @@ class Player(Roster, MyFleet):
         }
 
         # Initial attempt at registration
-        self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
+        #self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
+        self.send_message(message, ['arn:aws:sns:us-east-2:849664249614:BR_Topic'])
 
         # Set up flags for registration loop
         registered = False
@@ -39,9 +40,12 @@ class Player(Roster, MyFleet):
 
         # Keep trying to register a unique handle
         while not registered and not empty_name_list:
-            payload = self.sqs_client.receive_message(QueueUrl=self.queue.url, MaxNumberOfMessages=10, WaitTimeSeconds=20, VisibilityTimeout=0)
+            #payload = self.sqs_client.receive_message(QueueUrl=self.queue.url, MaxNumberOfMessages=10, WaitTimeSeconds=20, VisibilityTimeout=0)
+            payload = self.get_message()
             #print("Player: {} - payload: {}".format(strftime("%a, %d %b %Y %X +0000", gmtime()), payload))
 
+            if not payload:
+                continue
             if 'Messages' not in payload:
                 continue
             for msg in payload['Messages']:
@@ -76,7 +80,8 @@ class Player(Roster, MyFleet):
                     }
 
                     dmsg = self.sqs_client.delete_message(QueueUrl=self.queue.url, ReceiptHandle=receipthandle)
-                    self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
+                    #self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
+                    player.send_message(message, ['arn:aws:sns:us-east-2:849664249614:BR_Topic'])
                 #else:
                     #print("Should not get here: ", msg)
                     # Do not delete as this message may be intended for GameServer ignore and move on
