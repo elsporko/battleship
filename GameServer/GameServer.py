@@ -2,7 +2,8 @@ import boto3
 import json
 import sys
 from game.game import Game
-from game.sqs_policy import SQS_Policy
+sys.path.append('..')
+from lib.sqs_policy import SQS_Policy
 
 game=Game()
 
@@ -16,18 +17,20 @@ sns_arn = sns_game_topic['TopicArn']
 
 print("Creating queue Battleship_Registration")
 # Create queue
-queue = sqs_client.create_queue(QueueName='Battleship_Registration')
-sqs_arn = sqs_client.get_queue_attributes(QueueUrl=queue['QueueUrl'], AttributeNames=['QueueArn'])['Attributes']['QueueArn']
-sqs_policy = SQS_Policy()
+#queue = sqs_client.create_queue(QueueName='Battleship_Registration')
+#sqs_arn = sqs_client.get_queue_attributes(QueueUrl=queue['QueueUrl'], AttributeNames=['QueueArn'])['Attributes']['QueueArn']
+sqs_policy = SQS_Policy('Battleship_Registration', 'BR_Topic')
+queue = sqs_policy.queue
+print ("sqs queue: ", queue.url)
 
 print ("Tie topic to queue")
 # Tie queue with topic
-policy = sqs_policy.get_policy('BR_Topic', 'Battleship_Registration', queue['QueueUrl'])
-sqs_client.set_queue_attributes(QueueUrl=queue['QueueUrl'], Attributes={'Policy': policy})
+#policy = sqs_policy.build_policy('BR_Topic', 'Battleship_Registration', queue['QueueUrl'])
+#sqs_client.set_queue_attributes(QueueUrl=queue['QueueUrl'], Attributes={'Policy': policy})
 
 print ("Subscribing to topic")
 # Subscribe to topic
-sns_client.subscribe(TopicArn=sns_arn, Protocol='sqs', Endpoint=sqs_arn)
+#sns_client.subscribe(TopicArn=sns_arn, Protocol='sqs', Endpoint=sqs_arn)
 
 print ("GAME ON!!!!")
 def process_message(message):
@@ -69,13 +72,13 @@ def register(payload):
         return
 
     # next, we delete the message from the queue so no one else will process it again
-    ret = sqs_client.delete_message(QueueUrl=queue['QueueUrl'], ReceiptHandle=receipthandle)
+    ret = sqs_client.delete_message(QueueUrl=queue.url, ReceiptHandle=receipthandle)
 
     return
 
 count=1
 while True:
-    messages = sqs_client.receive_message(QueueUrl=queue['QueueUrl'],MaxNumberOfMessages=1, WaitTimeSeconds=20, VisibilityTimeout=3)
+    messages = sqs_client.receive_message(QueueUrl=queue.url,MaxNumberOfMessages=1, WaitTimeSeconds=20, VisibilityTimeout=3)
     print ("received message({}): {}".format(count, messages))
     count = count + 1
     if 'Messages' in messages: # when the queue is exhausted, the response dict contains no 'Messages' key

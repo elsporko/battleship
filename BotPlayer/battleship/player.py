@@ -31,7 +31,8 @@ class Player(Roster, MyFleet):
 
         print("Publish 1")
         print("Message: ", message)
-        self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
+        self.send_message(message, 'arn:aws:sns:us-east-2:849664249614:BR_Topic')
+        #self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
         print("Published")
 
         registered = False
@@ -72,7 +73,8 @@ class Player(Roster, MyFleet):
                     }
 
                     dmsg = self.sqs_client.delete_message(QueueUrl=self.queue.url, ReceiptHandle=receipthandle)
-                    self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
+                    self.sqs_client.send_message(message, 'arn:aws:sns:us-east-2:849664249614:BR_Topic')
+                    #self.sns_client.publish(TopicArn='arn:aws:sns:us-east-2:849664249614:BR_Topic', Message=json.dumps(message))
                 #else:
                     #print("Should not get here: ", msg)
                     # Do not delete as this message may be intended for GameServer ignore and move on
